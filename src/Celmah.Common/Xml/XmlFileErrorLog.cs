@@ -138,31 +138,33 @@ public class XmlFileErrorLog : ErrorLog
         }
 
         int totalCount;
-        IEnumerable<ErrorLogEntry> entries;
+        List<ErrorLogEntry> entries;
         if (filters.Count == 0)
         {
-            entries = await files
-                .Skip(errorIndex)
-                .Take(pageSize)
-                .ToAsyncEnumerable()
-                .SelectAwait(e => LoadErrorLogEntryAsync(e, cancellationToken))
-                .Where(e => e is not null)
-                .Select(e => e!)
-                .ToListAsync(cancellationToken: cancellationToken);
+            entries = [];
+            foreach (var file in files.Skip(errorIndex).Take(pageSize))
+            {
+                var entry = await LoadErrorLogEntryAsync(file, cancellationToken);
+                if (entry is not null)
+                    entries.Add(entry);
+            }
             totalCount = files.Length;
         }
         else
         {
-            var fEntries = await files
-                .ToAsyncEnumerable()
-                .SelectAwait(e => LoadErrorLogEntryAsync(e, cancellationToken))
-                .Where(e => e is not null && filters.IsMatch(e))
-                .ToListAsync(cancellationToken: cancellationToken);
+            var fEntries = new List<ErrorLogEntry>();
+            foreach (var file in files)
+            {
+                var entry = await LoadErrorLogEntryAsync(file, cancellationToken);
+                if (entry is not null && filters.IsMatch(entry))
+                    fEntries.Add(entry);
+            }
             totalCount = fEntries.Count;
 
             entries = fEntries
                 .Skip(errorIndex)
-                .Take(pageSize)!;
+                .Take(pageSize)
+                .ToList();
         }
 
         foreach (var entry in entries)

@@ -12,8 +12,5 @@
     <InternalsVisibleTo Include="Celmah.Tests" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Linq.Async" Version="7.0.0" />
-  </ItemGroup>
-  
+
 </Project>
