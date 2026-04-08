@@ -28,6 +28,9 @@ PACKAGES=(
   "src/Celmah/Celmah.csproj"
   "src/Celmah.SqlServer/Celmah.SqlServer.csproj"
   "src/Celmah.Postgresql/Celmah.Postgresql.csproj"
+  "src/Celmah.MySql/Celmah.MySql.csproj"
+  "src/Celmah.Redis/Celmah.Redis.csproj"
+  "src/Celmah.Serilog/Celmah.Serilog.csproj"
 )
 
 for proj in "${PACKAGES[@]}"; do

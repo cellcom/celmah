@@ -37,6 +37,9 @@ PACKAGES=(
   "src/Celmah/Celmah.csproj"
   "src/Celmah.SqlServer/Celmah.SqlServer.csproj"
   "src/Celmah.Postgresql/Celmah.Postgresql.csproj"
+  "src/Celmah.MySql/Celmah.MySql.csproj"
+  "src/Celmah.Redis/Celmah.Redis.csproj"
+  "src/Celmah.Serilog/Celmah.Serilog.csproj"
 )
 
 for proj in "${PACKAGES[@]}"; do
@@ -81,3 +84,6 @@ echo "Then run:"
 echo "  dotnet add package Celmah"
 echo "  dotnet add package Celmah.SqlServer"
 echo "  dotnet add package Celmah.Postgresql"
+echo "  dotnet add package Celmah.MySql"
+echo "  dotnet add package Celmah.Redis"
+echo "  dotnet add package Celmah.Serilog"
