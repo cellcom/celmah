@@ -1,9 +1,0 @@
-<Project>
-  <ItemGroup Condition="'$(IsPackable)' == 'true'">
-    <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="All" />
-  </ItemGroup>
-
-  <PropertyGroup Condition="'$(IsPackable)' != 'false'">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
-</Project>
