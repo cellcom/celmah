@@ -1,51 +1,24 @@
-import Vue from "vue";
-import router from "./router";
-import App from "./App.vue";
-import FlagIcon from "vue-flag-icon";
-import AsyncComputed from "vue-async-computed";
-import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
-import VueHighlightJS from "vue-highlight.js";
-import "vue-highlight.js/lib/allLanguages";
-import "highlight.js/styles/default.css";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import {
-  faCopy,
-  faExternalLinkAlt,
-  faInfoCircle,
-  faSearch,
-  faFilter,
-  faAngleDoubleDown,
-  faCalendarAlt,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import store from "./store";
-import axios from "axios";
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import router from './router'
+import App from './App.vue'
+import ToastContainer from './components/ToastContainer.vue'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'highlight.js/styles/default.css'
+import './styles/main.scss'
 
-library.add(
-  faCopy,
-  faExternalLinkAlt,
-  faInfoCircle,
-  faSearch,
-  faFilter,
-  faAngleDoubleDown,
-  faCalendarAlt
-);
+const app = createApp(App)
+app.use(createPinia())
+app.use(router)
 
-Vue.component("font-awesome-icon", FontAwesomeIcon);
+// Mount ToastContainer as a sibling of App
+const root = document.getElementById('app')
+app.mount(root)
 
-Vue.config.productionTip = false;
+// Create toast container outside app
+const toastDiv = document.createElement('div')
+toastDiv.id = 'toast-root'
+document.body.appendChild(toastDiv)
 
-Vue.use(require("vue-moment"));
-Vue.use(FlagIcon);
-Vue.use(AsyncComputed);
-Vue.use(BootstrapVue);
-Vue.use(IconsPlugin);
-Vue.use(VueHighlightJS);
-
-axios.defaults.headers["x-requested-with"] = "XMLHttpRequest";
-
-new Vue({
-  router,
-  render: (h) => h(App),
-  store: store,
-}).$mount("#app");
+const toastApp = createApp(ToastContainer)
+toastApp.mount(toastDiv)

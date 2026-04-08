@@ -1,0 +1,22 @@
+Celmah
+Copyright 2024-2026 Cellcom Israel
+
+This project is a derivative work based on:
+
+  - Elmah.AspNetCore by Joshua Searles et al.
+    https://github.com/jrsearles/Elmah.AspNetCore
+
+  - ElmahCore by ElmahCore, Андрей Найченко et al.
+    https://github.com/ElmahCore/ElmahCore
+
+  - Original ELMAH by Atif Aziz et al.
+    https://elmah.github.io/
+
+Licensed under the Apache License, Version 2.0.
+
+Modifications from upstream:
+  - Renamed from Elmah.AspNetCore to Celmah (namespaces, types, APIs, packages)
+  - Retargeted to .NET 10 only (removed multi-targeting for .NET 6-8)
+  - Updated NuGet package dependencies to latest versions
+  - Added local NuGet build/publish tooling
+  - Updated Vue SPA to use Celmah branding

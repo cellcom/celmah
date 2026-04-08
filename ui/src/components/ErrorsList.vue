@@ -1,232 +1,168 @@
 <template>
-  <div>
-    <div class="e-list">
-      <div
-        class="e-list-content"
-        id="e-view"
-        v-on:scroll="scroll"
-        :class="{ loading: loading }"
-      >
-        <template v-for="(item, index) in items">
-          <ErrorListItem
-            :class="{ gray: index % 2 === 0 }"
-            v-bind:item="item.error"
-            v-bind:log="item.log"
-            v-bind:id="item.id"
-            v-bind:key="item.id"
-          ></ErrorListItem>
-        </template>
-      </div>
-      <div class="total-count">
-        Loaded <span>{{ items.length }}</span> of
-        <span>{{ totalCount }}</span> errors
-      </div>
+  <div class="e-list">
+    <div
+      class="e-list-content"
+      ref="scrollEl"
+      :class="{ loading: loading }"
+    >
+      <ErrorListItem
+        v-for="(item, index) in items"
+        :key="item.id"
+        :class="{ gray: index % 2 === 0 }"
+        :item="item.error"
+        :id="item.id"
+        :is-selected="selected && selected.id === item.id"
+        @select="selectItem(item)"
+      />
+    </div>
+    <div class="total-count">
+      Loaded <span>{{ items.length }}</span> of
+      <span>{{ totalCount }}</span> errors
     </div>
   </div>
 </template>
 
-<script>
-import axios from "axios";
-import store from "./../store";
-import ErrorListItem from "@/components/ErrorListItem";
+<script setup>
+import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { useErrorStore } from '@/store'
+import { api, getCelmahRoot } from '@/api'
+import { showToast } from './toast-service'
+import ErrorListItem from './ErrorListItem.vue'
 
-export default {
-  name: "ErrorsList",
-  components: { ErrorListItem },
-  data: function () {
-    return {
-      filter: "",
-      items: [],
-      totalCount: 0,
-      loading: false,
-      errorIndex: 0,
-      loaded: false,
-      loadNewTimerStarted: false,
-      filtersHash: "",
-      loadTimerId: null,
-    };
-  },
-  watch: {
-    "$store.state.searchText"() {
-      this.loadErrors();
-    },
-    "$store.state.filterTags"() {
-      var isNewFilter = this.filtersHash != store.getters.filtersHash;
-      if (isNewFilter) {
-        this.filtersHash = store.getters.filtersHash;
-        this.loadErrors();
+const emit = defineEmits(['select'])
+
+const store = useErrorStore()
+const scrollEl = ref(null)
+const items = ref([])
+const totalCount = ref(0)
+const loading = ref(false)
+const errorIndex = ref(0)
+const loaded = ref(false)
+const loadTimerId = ref(null)
+const loadNewTimerStarted = ref(false)
+const filtersHash = ref('')
+const selected = defineModel('selected')
+
+watch(() => store.searchText, () => loadErrors())
+watch(() => store.filterTags, () => {
+  const newHash = store.filtersHash
+  if (newHash !== filtersHash.value) {
+    filtersHash.value = newHash
+    loadErrors()
+  }
+}, { deep: true })
+
+onMounted(() => {
+  loadErrors()
+  window.addEventListener('resize', handleResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+  if (loadTimerId.value) clearTimeout(loadTimerId.value)
+})
+
+function handleResize() {
+  if (!scrollEl.value) return
+  const height = window.innerHeight - scrollEl.value.offsetTop - 30
+  scrollEl.value.style.height = height + 'px'
+}
+
+function setupScroll() {
+  const el = scrollEl.value
+  if (!el) return
+  el.onscroll = () => {
+    if (loading.value || loaded.value) return
+    const bottomOfWindow = el.scrollTop + el.clientHeight >= el.scrollHeight - 2
+    if (bottomOfWindow) {
+      loadMore()
+    }
+  }
+}
+
+function loadMore() {
+  loading.value = true
+  api.get(`${getCelmahRoot()}/api/errors?i=${errorIndex.value}&s=50`)
+    .then(response => {
+      if (response.data && response.data.errors.length > 0) {
+        errorIndex.value += response.data.errors.length
+      } else {
+        loaded.value = true
       }
-    },
-  },
-  mounted: function () {
-    this.loadErrors();
-  },
-  computed: {
-    root: function () {
-      return document.getElementById("e-view");
-    },
-  },
-  created() {
-    window.addEventListener("resize", this.handleResize);
-  },
-  destroyed() {
-    window.removeEventListener("resize", this.handleResize);
-  },
-  methods: {
-    handleResize() {
-      if (!this.root) {
-        return;
+      loading.value = false
+      items.value = items.value.concat(response.data.errors)
+      totalCount.value = response.data.totalCount
+    })
+    .catch(error => {
+      loading.value = false
+      console.log(error)
+      showToast('Data loading error.', 'danger')
+    })
+}
+
+function loadErrors() {
+  if (loadTimerId.value != null) {
+    clearTimeout(loadTimerId.value)
+    loadTimerId.value = null
+  }
+  const filterTags = store.filterTags
+  const searchText = store.searchText
+
+  api.post(`${getCelmahRoot()}/api/errors?p=0&s=50&q=${encodeURIComponent(searchText)}`, filterTags)
+    .then(response => {
+      items.value = response.data.errors
+      errorIndex.value = response.data.errors.length
+      totalCount.value = response.data.totalCount
+      if (items.value.length > 0) {
+        selected.value = items.value[0]
       }
-      const height = window.innerHeight - this.root.offsetTop - 30;
-      this.root.style.height = height + "px";
-      if (window.innerWidth > 1024) {
-        this.$parent.collapsed = false;
+    })
+    .catch(error => {
+      console.log(error)
+      showToast('Data loading error.', 'danger')
+    })
+    .finally(() => {
+      handleResize()
+      nextTick(setupScroll)
+      if (!loadNewTimerStarted.value) {
+        loadNewTimerStarted.value = true
+        loadTimerId.value = setTimeout(() => loadNewErrors(), 10000)
       }
-    },
-    scroll() {
-      if (!this.root) {
-        return;
+    })
+}
+
+function loadNewErrors() {
+  const filterTags = store.filterTags
+  const searchText = store.searchText
+  const id = items.value.length > 0 ? items.value[0].id : ''
+
+  api.post(`${getCelmahRoot()}/api/new-errors?id=${id}&q=${encodeURIComponent(searchText)}`, filterTags)
+    .then(response => {
+      if (response.data?.errors?.length) {
+        const size = Math.min(100, response.data.totalCount)
+        items.value = response.data.errors.concat(items.value).slice(0, size)
+        totalCount.value = response.data.totalCount
+        errorIndex.value += response.data.errors.length
+        showToast(`${response.data.errors.length} new error(s) loaded.`, 'warning')
       }
-      this.root.onscroll = () => {
-        if (this.loading || this.loaded) {
-          return;
-        }
+    })
+    .catch(error => {
+      console.log(error)
+      showToast('Data loading error.', 'danger')
+    })
+    .finally(() => {
+      loadTimerId.value = setTimeout(loadNewErrors, 10000)
+    })
+}
 
-        let bottomOfWindow =
-          this.root.scrollTop + this.root.clientHeight ===
-          this.root.scrollHeight;
-
-        if (bottomOfWindow) {
-          this.loading = true;
-          // eslint-disable-next-line no-undef
-          axios
-            .get(
-              (window.$elmah_root || "/elmah") +
-                "/api/errors?i=" +
-                this.errorIndex +
-                "&s=50"
-            )
-            .then((response) => {
-              if (response.data && response.data.errors.length > 0) {
-                this.errorIndex += response.data.errors.length;
-              } else {
-                this.loaded = true;
-              }
-
-              this.loading = false;
-              this.items = this.items.concat(response.data.errors);
-              this.totalCount = response.data.totalCount;
-            })
-            .catch((error) => {
-              this.loading = false;
-              console.log(error);
-              this.$bvToast.toast("Data loading error.", {
-                variant: "danger",
-                solid: true,
-                noCloseButton: true,
-                autoHideDelay: 2000,
-              });
-            });
-        }
-      };
-    },
-    loadErrors() {
-      if (this.loadTimerId != null) {
-        clearTimeout(this.loadTimerId);
-        this.loadTimerId = null;
-      }
-
-      var filterTags = store.getters.filterTags;
-      var searchText = store.getters.searchText;
-
-      axios
-        .post(
-          (window.$elmah_root || "/elmah") +
-            "/api/errors?p=0&s=50&q=" +
-            encodeURIComponent(searchText),
-          filterTags
-        )
-        .then((response) => {
-          this.items = response.data.errors;
-          this.errorIndex += response.data.errors.length;
-          this.totalCount = response.data.totalCount;
-          this.$parent.selected = this.items.length > 0 ? this.items[0] : null;
-        })
-        .catch((error) => {
-          console.log(error);
-          this.$bvToast.toast("Data loading error.", {
-            variant: "danger",
-            solid: true,
-            noCloseButton: true,
-            autoHideDelay: 2000,
-          });
-        })
-        .finally(() => {
-          if (!this.loadNewTimerStarted) {
-            this.loadNewTimerStarted = true;
-            setTimeout(() => this.loadNewErrors(this), 10000);
-          }
-        });
-      this.handleResize();
-    },
-    loadNewErrors(ctx) {
-      var filterTags = store.getters.filterTags;
-      var searchText = store.getters.searchText;
-      let id = ctx.items.length > 0 ? ctx.items[0].id : "";
-      // eslint-disable-next-line no-undef
-      axios
-        .post(
-          (window.$elmah_root || "/elmah") +
-            "/api/new-errors?id=" +
-            id +
-            "&q=" +
-            encodeURIComponent(searchText),
-          filterTags
-        )
-        .then((response) => {
-          if (
-            response.data &&
-            response.data.errors &&
-            response.data.errors.length
-          ) {
-            var size = Math.min(100, response.data.totalCount);
-            ctx.items = response.data.errors.concat(ctx.items).slice(0, size);
-            this.totalCount = response.data.totalCount;
-            this.errorIndex += response.data.errors.length;
-            this.$bvToast.toast(
-              `${response.data.errors.length} new error(s) loaded.`,
-              {
-                variant: "warning",
-                solid: true,
-                noCloseButton: true,
-                autoHideDelay: 2000,
-              }
-            );
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          this.$bvToast.toast("Data loading error.", {
-            variant: "danger",
-            solid: true,
-            noCloseButton: true,
-            autoHideDelay: 2000,
-          });
-        })
-        .finally(
-          () =>
-            (this.loadTimerId = setTimeout(
-              () => this.loadNewErrors(ctx),
-              10000
-            ))
-        );
-    },
-  },
-};
+function selectItem(item) {
+  selected.value = item
+  emit('select', item)
+}
 </script>
 
 <style lang="scss" scoped>
-@import "src/styles/variables";
+@use '../styles/variables' as *;
 .e-list {
   width: 40%;
   max-width: 500px;
@@ -238,17 +174,7 @@ export default {
     margin: 4px;
     text-align: start;
     font-size: 13px;
-    span {
-      font-weight: 600;
-    }
-  }
-  .e-list-header {
-    padding: 8px 10px;
-    border-bottom: 1px solid $border-main-color;
-
-    .input-group {
-      flex-grow: 1;
-    }
+    span { font-weight: 600; }
   }
   .e-list-content {
     overflow-y: scroll;

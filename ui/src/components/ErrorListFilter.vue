@@ -1,256 +1,191 @@
 <template>
   <div>
-    <div v-if="filterTags.length > 0">
-      <b-button
-        size="sm"
-        variant="light"
-        @click="clearFilterTags"
-        style="float: right; margin: 4px"
-        >Clear filter</b-button
+    <!-- Active filter tags -->
+    <div v-if="activeTags.length > 0" class="d-flex flex-wrap align-items-center p-2 bg-light border-bottom">
+      <button class="btn btn-sm btn-light me-2" @click="clearAll">Clear filter</button>
+      <span
+        v-for="tag in activeTags"
+        :key="tag"
+        class="badge bg-info text-white me-1 d-inline-flex align-items-center"
+        style="font-size: 0.85rem"
       >
-      <b-form-tags v-model="filterTags" tag-variant="info" input-class="d-none">
-        <template v-slot="{ tags, tagVariant, removeTag }">
-          <div class="d-inline-block">
-            <b-form-tag
-              v-for="tag in tags"
-              @remove="removeTag(tag)"
-              :key="tag"
-              :title="tag"
-              :variant="tagVariant"
-            >
-              <b-link @click="editFilterTag(tag)" style="color: white">{{
-                tag
-              }}</b-link>
-            </b-form-tag>
-          </div>
-        </template>
-      </b-form-tags>
+        <a href="#" class="text-white text-decoration-none me-1" @click.prevent="editTag(tag)">{{ tag }}</a>
+        <button class="btn-close btn-close-white" style="font-size: 0.5rem" @click="removeTag(tag)"></button>
+      </span>
     </div>
 
-    <b-modal
-      id="filter-modal"
-      ref="modal"
-      :title="!filterEditMode ? 'Add filter' : 'Edit filter'"
-      size="lg"
-      @ok="handleOkFilterForm"
-      @hide="resetFilterForm"
-      centered
-    >
-      <form ref="form" @submit.stop.prevent="handleSubmit">
-        <div class="row">
-          <b-form-group
-            class="col-sm"
-            label="Property"
-            label-for="property-input"
-          >
-            <b-form-select
-              id="property-input"
-              v-model="filterProperty"
-              :options="filterProperties"
-            ></b-form-select>
-          </b-form-group>
-          <b-form-group
-            class="col-sm"
-            label="Condition"
-            label-for="condition-input"
-          >
-            <b-form-select
-              id="condition-input"
-              v-model="filterCondition"
-              :options="filterTextConditions"
-            ></b-form-select>
-          </b-form-group>
-          <b-form-group
-            class="col-sm"
-            label="Value"
-            label-for="text-value-input"
-          >
-            <b-form-input
-              id="text-value-input"
-              v-model="filterTextValue"
-              v-if="!filterPropertyIsDate"
-            ></b-form-input>
-            <b-form-datepicker
-              v-model="filterDateValue"
-              v-if="filterPropertyIsDate"
-              :date-format-options="{
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric',
-              }"
-            ></b-form-datepicker>
-            <b-form-timepicker
-              class="mt-sm-2"
-              v-model="filterTimeValue"
-              v-if="filterPropertyIsDateTime"
-              show-seconds
-            ></b-form-timepicker>
-          </b-form-group>
+    <!-- Filter modal -->
+    <div v-if="showModal" class="modal d-block" tabindex="-1" @click.self="close">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ editMode ? 'Edit filter' : 'Add filter' }}</h5>
+            <button type="button" class="btn-close" @click="close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-sm">
+                <label class="form-label">Property</label>
+                <select class="form-select" v-model="filterProperty">
+                  <option v-for="p in properties" :key="p.value" :value="p.value">{{ p.text }}</option>
+                </select>
+              </div>
+              <div class="col-sm">
+                <label class="form-label">Condition</label>
+                <select class="form-select" v-model="filterCondition">
+                  <option v-for="c in conditions" :key="c.value" :value="c.value">{{ c.text }}</option>
+                </select>
+              </div>
+              <div class="col-sm">
+                <label class="form-label">Value</label>
+                <input
+                  v-if="!isDate"
+                  class="form-control"
+                  v-model="textValue"
+                />
+                <input
+                  v-if="isDate"
+                  class="form-control"
+                  type="date"
+                  v-model="dateValue"
+                />
+                <input
+                  v-if="isDateTime"
+                  class="form-control mt-2"
+                  type="time"
+                  step="1"
+                  v-model="timeValue"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" @click="close">Close</button>
+            <button class="btn btn-info text-white" @click="submit">{{ editMode ? 'Save' : 'Add' }}</button>
+          </div>
         </div>
-      </form>
-      <template #modal-footer="{ ok, cancel }">
-        <b-button variant="secondary" class="float-right" @click="cancel()">
-          Close
-        </b-button>
-        <b-button variant="info" class="float-right" @click="ok()">
-          {{ !filterEditMode ? "Add" : "Save" }}
-        </b-button>
-      </template>
-    </b-modal>
+      </div>
+    </div>
   </div>
 </template>
 
-<script>
-import store from "./../store";
-import dateFormat from "dateformat";
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { useErrorStore } from '@/store'
 
-export default {
-  name: "ErrorListFilter",
-  created() {
-    this.$root.$refs.ErrorListFilter = this;
-  },
-  data: function () {
-    return {
-      filterTags: [],
-      filterProperty: "message",
-      filterProperties: [
-        { value: "application", text: "Application" },
-        { value: "body", text: "Body" },
-        { value: "client", text: "Client IP" },
-        { value: "date-time", text: "Date/Time" },
-        { value: "details", text: "Details" },
-        { value: "host", text: "Host" },
-        { value: "message", text: "Message" },
-        { value: "method", text: "Method" },
-        { value: "source", text: "Source" },
-        { value: "status-code", text: "Status Code" },
-        { value: "type", text: "Type" },
-        { value: "url", text: "Url" },
-        { value: "user", text: "User" },
-      ],
-      filterCondition: "=",
-      filterTextConditions: [
-        { value: "=", text: "Equals" },
-        { value: "!=", text: "Not Equals" },
-        { value: "~", text: "Contains" },
-        { value: "!~", text: "Does Not Contain" },
-      ],
-      filterTextValue: "",
-      filterDateValue: null,
-      filterTimeValue: null,
-      filterEditMode: false,
-      changedFilterTag: null,
-    };
-  },
-  watch: {
-    filterTags(filterTags) {
-      store.dispatch("changeFilterTags", filterTags);
-    },
-    filterPropertyIsDate(isDate) {
-      if (isDate && this.filterDateValue == null) {
-        this.filterDateValue = dateFormat(new Date(), "yyyy-MM-dd");
-      }
-    },
-    filterPropertyIsDateTime(isDateTime) {
-      if (isDateTime && this.filterTimeValue == null) {
-        this.filterTimeValue = "00:00:00";
-      }
-    },
-  },
-  methods: {
-    clearFilterTags() {
-      this.filterTags = [];
-    },
-    resetFilterForm() {
-      this.filterProperty = "message";
-      this.filterCondition = "=";
-      this.filterTextValue = "";
-      this.filterDateValue = null;
-      this.filterTimeValue = null;
-      this.filterEditMode = false;
-      this.changedFilterTag = null;
-    },
-    handleOkFilterForm(bvModalEvent) {
-      bvModalEvent.preventDefault();
-      this.handleSubmitFilterForm();
-    },
-    handleSubmitFilterForm() {
-      this.$nextTick(() => {
-        this.$bvModal.hide("filter-modal");
-      });
+const emit = defineEmits(['close'])
+const store = useErrorStore()
 
-      let isDate = this.filterPropertyIsDate;
-      let isDateTime = this.filterPropertyIsDateTime;
-      var filterTag = this.toFilterTag(
-        this.filterProperty,
-        this.filterCondition,
-        !isDate ? this.filterTextValue : null,
-        isDate ? this.filterDateValue : null,
-        isDateTime ? this.filterTimeValue : null
-      );
+const showModal = ref(true)
+const filterProperty = ref('message')
+const filterCondition = ref('=')
+const textValue = ref('')
+const dateValue = ref(null)
+const timeValue = ref(null)
+const editMode = ref(false)
+const editingTag = ref(null)
 
-      if (this.changedFilterTag != null) {
-        var i = this.filterTags.indexOf(this.changedFilterTag);
-        if (i != -1) this.filterTags.splice(i, 1);
-      }
-      this.pushFilterTag(filterTag);
-    },
-    pushFilterTag(filterTag) {
-      if (this.filterTags.indexOf(filterTag) == -1) {
-        this.filterTags.push(filterTag);
-        store.dispatch("changeFilterTags", this.filterTags);
-      }
-    },
-    addFilterTag(filterTag) {
-      this.pushFilterTag(filterTag);
-    },
-    editFilterTag(filterTag) {
-      this.openFilterTagDialog(filterTag, true);
-    },
-    openFilterTagDialog(filterTag, editMode) {
-      var match = filterTag.match(/([^\s]*)\s+([^\s]*)\s+(.*)/);
+const properties = [
+  { value: 'application', text: 'Application' },
+  { value: 'body', text: 'Body' },
+  { value: 'client', text: 'Client IP' },
+  { value: 'date-time', text: 'Date/Time' },
+  { value: 'details', text: 'Details' },
+  { value: 'host', text: 'Host' },
+  { value: 'message', text: 'Message' },
+  { value: 'method', text: 'Method' },
+  { value: 'source', text: 'Source' },
+  { value: 'status-code', text: 'Status Code' },
+  { value: 'type', text: 'Type' },
+  { value: 'url', text: 'Url' },
+  { value: 'user', text: 'User' },
+]
 
-      this.filterProperty = match[1];
-      this.filterCondition = match[2];
+const conditions = [
+  { value: '=', text: 'Equals' },
+  { value: '!=', text: 'Not Equals' },
+  { value: '~', text: 'Contains' },
+  { value: '!~', text: 'Does Not Contain' },
+]
 
-      let value = match[3];
-      let isDate = this.filterPropertyIsDate;
-      let isDateTime = this.filterPropertyIsDateTime;
+const activeTags = computed(() => store.filterTags)
 
-      this.filterTextValue = !isDate ? value : null;
-      this.filterDateValue = isDate ? value : null;
-      this.filterTimeValue = isDateTime ? value.substring(11, 11 + 8) : null;
-      this.filterEditMode = editMode;
-      this.changedFilterTag = filterTag;
+const isDate = computed(() => filterProperty.value === 'date-time')
+const isDateTime = computed(() => isDate.value && (filterCondition.value === '=' || filterCondition.value === '!='))
 
-      this.$refs["modal"].show();
-    },
-    toFilterTag(property, condition, textValue, dateValue, timeValue) {
-      let toFilterTag = property + " " + condition + " ";
-      if (dateValue) {
-        toFilterTag += dateValue;
-        if (timeValue) toFilterTag += " " + timeValue;
-      } else toFilterTag += textValue;
+watch(isDate, (v) => {
+  if (v && !dateValue.value) {
+    const d = new Date()
+    dateValue.value = d.toISOString().substring(0, 10)
+  }
+})
+watch(isDateTime, (v) => {
+  if (v && !timeValue.value) {
+    timeValue.value = '00:00:00'
+  }
+})
 
-      return toFilterTag.trim();
-    },
-  },
-  computed: {
-    elmah_root: function () {
-      return window.$elmah_root;
-    },
-    isErrorsPage() {
-      return this.$route.name === "Errors";
-    },
-    filterPropertyIsDate: function () {
-      return this.filterProperty == "date-time";
-    },
-    filterPropertyIsDateTime: function () {
-      return (
-        this.filterProperty == "date-time" &&
-        (this.filterCondition == "=" || this.filterCondition == "!=")
-      );
-    },
-  },
-};
+function close() {
+  emit('close')
+}
+
+function clearAll() {
+  store.clearFilterTags()
+}
+
+function removeTag(tag) {
+  store.removeFilterTag(tag)
+}
+
+function toTag(property, condition, text, date, time) {
+  let tag = property + ' ' + condition + ' '
+  if (date) {
+    tag += date
+    if (time) tag += ' ' + time
+  } else {
+    tag += text
+  }
+  return tag.trim()
+}
+
+function submit() {
+  const tag = toTag(
+    filterProperty.value,
+    filterCondition.value,
+    !isDate.value ? textValue.value : null,
+    isDate.value ? dateValue.value : null,
+    isDateTime.value ? timeValue.value : null,
+  )
+  if (editingTag.value) {
+    store.removeFilterTag(editingTag.value)
+  }
+  store.addFilterTag(tag)
+  close()
+}
+
+function editTag(tag) {
+  const match = tag.match(/([^\s]*)\s+([^\s]*)\s+(.*)/)
+  if (!match) return
+  filterProperty.value = match[1]
+  filterCondition.value = match[2]
+  const val = match[3]
+  if (isDate.value) {
+    dateValue.value = val
+    if (isDateTime.value) {
+      timeValue.value = val.substring(11, 19)
+    }
+  } else {
+    textValue.value = val
+  }
+  editMode.value = true
+  editingTag.value = tag
+  showModal.value = true
+}
+
+// Expose addFilterTag for programmatic use from child components
+function addFilterTag(tag) {
+  store.addFilterTag(tag)
+}
+
+defineExpose({ addFilterTag })
 </script>

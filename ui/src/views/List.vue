@@ -1,13 +1,7 @@
 <template>
-  <ErrorsView></ErrorsView>
+  <ErrorsView />
 </template>
 
-<script>
-import ErrorsView from "@/components/ErrorsView";
-export default {
-  name: "List",
-  components: { ErrorsView },
-};
+<script setup>
+import ErrorsView from '@/components/ErrorsView.vue'
 </script>
-
-<style scoped></style>

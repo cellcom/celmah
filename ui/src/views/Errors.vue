@@ -1,15 +1,7 @@
 <template>
-  <div class="m-4">
-    <ErrorsTable></ErrorsTable>
-  </div>
+  <ErrorsView />
 </template>
 
-<script>
-import ErrorsTable from "@/components/ErrorsTable";
-export default {
-  name: "Errors",
-  components: { ErrorsTable },
-};
+<script setup>
+import ErrorsView from '@/components/ErrorsView.vue'
 </script>
-
-<style scoped></style>

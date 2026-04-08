@@ -1,38 +1,24 @@
 <template>
   <div>
-    <ErrorDetail :item="item" :id="id"></ErrorDetail>
+    <ErrorDetail :item="item" :id="id" />
   </div>
 </template>
 
-<script>
-import axios from "axios";
-import ErrorDetail from "@/components/ErrorDetail";
-export default {
-  name: "Detail",
-  props: ["id"],
-  data: function () {
-    return {
-      item: {},
-    };
-  },
-  components: { ErrorDetail },
-  mounted() {
-    axios
-      .get((window.$elmah_root || "/elmah") + "/api/error?id=" + this.id)
-      .then((response) => {
-        this.item = response.data.error;
-      })
-      .catch((error) => {
-        console.log(error);
-        this.$bvToast.toast("Data loading error.", {
-          variant: "danger",
-          solid: true,
-          noCloseButton: true,
-          autoHideDelay: 2000,
-        });
-      });
-  },
-};
-</script>
+<script setup>
+import { ref, onMounted } from 'vue'
+import { api, getCelmahRoot } from '@/api'
+import { showToast } from '@/components/toast-service'
+import ErrorDetail from '@/components/ErrorDetail.vue'
 
-<style scoped></style>
+const props = defineProps(['id'])
+const item = ref({})
+
+onMounted(() => {
+  api.get(`${getCelmahRoot()}/api/error?id=${props.id}`)
+    .then(response => { item.value = response.data.error })
+    .catch(error => {
+      console.log(error)
+      showToast('Data loading error.', 'danger')
+    })
+})
+</script>

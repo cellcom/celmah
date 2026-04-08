@@ -1,0 +1,26 @@
+@use 'sass:color';
+@use 'variables' as *;
+
+// Global styles
+.filter-link-hid {
+  .filter-link {
+    visibility: hidden;
+  }
+  &:hover .filter-link {
+    visibility: visible;
+  }
+}
+
+.filter-link {
+  cursor: pointer;
+  color: $filter-link-color;
+  &:hover {
+    color: color.adjust($filter-link-color, $lightness: -10%);
+  }
+}
+
+pre {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}

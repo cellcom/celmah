@@ -1,92 +1,81 @@
 <template>
   <div id="app">
-    <div>
-      <b-navbar toggleable="lg" type="dark" variant="dark">
-        <b-navbar-brand href="#">Elmah</b-navbar-brand>
-
-        <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
-        <b-collapse id="nav-collapse" is-nav>
-          <b-navbar-nav>
-            <b-nav-item :to="{ name: 'Errors' }">Errors</b-nav-item>
-            <b-nav-item target="_blank" :href="elmah_root + '/rss'"
-              >RSS Feeds</b-nav-item
-            >
-            <b-nav-item target="_blank" :href="elmah_root + '/digestrss'"
-              >RSS Digest</b-nav-item
-            >
-            <b-nav-item target="_blank" :href="elmah_root + '/download'"
-              >Download Log</b-nav-item
-            >
-            <b-nav-item
-              target="_blank"
-              :href="'https://github.com/jrsearles/Elmah.AspNetCore'"
-              >Help</b-nav-item
-            >
-            <b-nav-item :to="{ name: 'About' }">About</b-nav-item>
-          </b-navbar-nav>
-        </b-collapse>
-
-        <div v-if="$route.name === 'Errors'">
-          <b-input-group>
-            <b-button class="mr-sm-2" variant="light" v-b-modal.filter-modal>
-              <font-awesome-icon icon="filter" class="mr-sm-2" />
-              <span style="font-size: 0.9rem">Add Filter</span>
-            </b-button>
-            <b-input-group-prepend is-text>
-              <font-awesome-icon icon="search" />
-            </b-input-group-prepend>
-            <b-form-input
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Celmah</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav-collapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="nav-collapse" class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <router-link class="nav-link" :to="{ name: 'Errors' }">Errors</router-link>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" target="_blank" :href="celmahRoot + '/rss'">RSS Feeds</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" target="_blank" :href="celmahRoot + '/digestrss'">RSS Digest</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" target="_blank" :href="celmahRoot + '/download'">Download Log</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" target="_blank" href="https://github.com/cellcom/celmah">Help</a>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" :to="{ name: 'About' }">About</router-link>
+          </li>
+        </ul>
+        <div v-if="$route.name === 'Errors'" class="d-flex align-items-center">
+          <button class="btn btn-light btn-sm me-2" @click="showFilterModal = true">
+            <FilterIcon :size="14" class="me-1" />
+            <span style="font-size: 0.9rem">Add Filter</span>
+          </button>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text"><SearchIcon :size="14" /></span>
+            <input
+              class="form-control"
               placeholder="Search"
               v-model="searchText"
               @keydown.enter.prevent="search"
-            ></b-form-input>
-          </b-input-group>
+            />
+          </div>
         </div>
-      </b-navbar>
-    </div>
-
-    <ErrorListFilter></ErrorListFilter>
-    <router-view></router-view>
+      </div>
+    </nav>
+    <ErrorListFilter v-if="showFilterModal" @close="showFilterModal = false" />
+    <router-view />
   </div>
 </template>
 
-<script>
-import ErrorListFilter from "@/components/ErrorListFilter";
-import store from "./store";
+<script setup>
+import { ref, computed } from 'vue'
+import { FilterIcon, SearchIcon } from 'lucide-vue-next'
+import { useErrorStore } from './store'
+import ErrorListFilter from '@/components/ErrorListFilter.vue'
 
-export default {
-  name: "App",
-  components: { ErrorListFilter },
-  data: function () {
-    return {
-      appName: "Elmah",
-      searchText: "",
-    };
-  },
-  methods: {
-    search() {
-      store.dispatch("changeSearchText", this.searchText);
-    },
-  },
-  computed: {
-    elmah_root: function () {
-      return window.$elmah_root;
-    },
-  },
-};
-</script>
-<style lang="sass">
-@import '../node_modules/typeface-roboto/index.css'
-</style>
-<style lang="scss">
-@import "node_modules/bootstrap/scss/bootstrap.scss";
-@import "node_modules/bootstrap-vue/src/index.scss";
-body {
-  font-family: "Roboto", sans-serif;
+const store = useErrorStore()
+const searchText = ref('')
+const showFilterModal = ref(false)
+
+const celmahRoot = computed(() => window.$celmah_root)
+
+function search() {
+  store.setSearchText(searchText.value)
 }
-html,
+</script>
+
+<style lang="scss">
+@use './styles/variables' as *;
+
 body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+html, body {
   overflow-y: hidden;
 }
+
+// Expose ErrorListFilter ref for programmatic access from child components
+// via the global property pattern
 </style>

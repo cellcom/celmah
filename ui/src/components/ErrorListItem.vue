@@ -1,12 +1,12 @@
 <template>
   <div
     class="e-list-item"
-    :class="{ selected: $parent.$parent.selected.id === id }"
+    :class="{ selected: isSelected }"
     @click="onSelect"
   >
     <div class="e-list-item-col1" :title="item.time">
-      <div :class="[item.severity.toLowerCase()]">{{ item.statusCode }}</div>
-      <span>{{ item.time | moment("from", "now", true) }}</span>
+      <div :class="severityClass">{{ item.statusCode }}</div>
+      <span>{{ timeAgo(item.time) }}</span>
     </div>
     <div class="e-list-item-col2">
       <div class="type">{{ item.type }}</div>
@@ -19,31 +19,30 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "ErrorListItem",
-  props: {
-    item: { type: Object, default: () => ({}) },
-    log: { type: Object, default: () => ({}) },
-    id: { type: String, default: () => "" },
-  },
-  methods: {
-    onSelect: function () {
-      this.$parent.$parent.selected = {
-        error: this.item,
-        log: this.log,
-        id: this.id,
-      };
-      if (window.innerWidth <= 1024)
-        this.$parent.$parent.collapsed = !this.$parent.$parent.collapsed;
-      else this.$parent.$parent.collapsed = false;
-    },
-  },
-};
+<script setup>
+import { computed } from 'vue'
+import { timeAgo } from '@/utils'
+
+const props = defineProps({
+  item: { type: Object, default: () => ({}) },
+  id: { type: String, default: '' },
+  isSelected: { type: Boolean, default: false },
+})
+
+const emit = defineEmits(['select'])
+
+const severityClass = computed(() => {
+  const s = (props.item.severity || '').toLowerCase()
+  return s || ''
+})
+
+function onSelect() {
+  emit('select')
+}
 </script>
 
 <style lang="scss" scoped>
-@import "src/styles/variables";
+@use '../styles/variables' as *;
 .e-list-item {
   cursor: default;
   display: flex;
@@ -87,15 +86,9 @@ export default {
       font-weight: 600;
       margin-bottom: 2px;
     }
-    div.error {
-      background-color: $error-color;
-    }
-    div.warning {
-      background-color: $warning-color;
-    }
-    div.success {
-      background-color: $success-color;
-    }
+    div.error { background-color: $error-color; }
+    div.warning { background-color: $warning-color; }
+    div.success { background-color: $success-color; }
   }
   .e-list-item-col2 {
     flex-grow: 1;
@@ -124,9 +117,7 @@ export default {
       font-size: 14px;
       font-weight: 500;
     }
-    .message {
-      font-size: 13px;
-    }
+    .message { font-size: 13px; }
   }
 }
 </style>

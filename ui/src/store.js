@@ -1,63 +1,32 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { defineStore } from 'pinia'
 
-Vue.use(Vuex);
-
-function _arrayEquals(array1, array2) {
-  if (!array1 || !array2) return false;
-  if (array2 === array1) return true;
-  if (array1.length != array2.length) return false;
-
-  for (var i = 0, l = array1.length; i < l; i++) {
-    if (array1[i] instanceof Array && array2[i] instanceof Array) {
-      if (!array1[i].equals(array2[i])) return false;
-    } else if (array1[i] != array2[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
-const store = new Vuex.Store({
-  state: {
-    searchText: "",
+export const useErrorStore = defineStore('errors', {
+  state: () => ({
+    searchText: '',
     filterTags: [],
-  },
-  mutations: {
-    updateSearchText(state, payload) {
-      state.searchText = payload;
-    },
-    updateFilterTag(state, payload) {
-      if (_arrayEquals(state.filterTags, payload)) return;
-      state.filterTags = payload;
+  }),
+  getters: {
+    filtersHash(state) {
+      return state.filterTags.join(' | ')
     },
   },
   actions: {
-    changeSearchText(context, payload) {
-      context.commit("updateSearchText", payload);
+    setSearchText(text) {
+      this.searchText = text
     },
-    changeFilterTags(context, payload) {
-      context.commit("updateFilterTag", payload);
+    setFilterTags(tags) {
+      this.filterTags = [...tags]
     },
-  },
-  getters: {
-    searchText(state) {
-      return state.searchText;
+    addFilterTag(tag) {
+      if (!this.filterTags.includes(tag)) {
+        this.filterTags.push(tag)
+      }
     },
-    filterTags(state) {
-      let filterTags = [];
-      state.filterTags.forEach(function (t) {
-        filterTags.push(t);
-      });
-      return filterTags;
+    removeFilterTag(tag) {
+      this.filterTags = this.filterTags.filter(t => t !== tag)
     },
-    filtersHash(state) {
-      let hash = "";
-      state.filterTags.forEach(function (t) {
-        hash += " | " + t;
-      });
-      return hash;
+    clearFilterTags() {
+      this.filterTags = []
     },
   },
-});
-export default store;
+})
