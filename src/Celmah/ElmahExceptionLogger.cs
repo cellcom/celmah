@@ -16,8 +16,8 @@ internal sealed class CelmahExceptionLogger : ICelmahExceptionLogger
     private readonly ErrorLog _errorLog;
     private readonly IErrorFactory _errorFactory;
     private readonly ILogger<CelmahExceptionLogger> _logger;
-    private readonly List<IErrorFilter> _filters = new List<IErrorFilter>();
-    private readonly IEnumerable<IErrorNotifier> _notifiers = Enumerable.Empty<IErrorNotifier>();
+    private readonly List<IErrorFilter> _filters = [];
+    private readonly IEnumerable<IErrorNotifier> _notifiers = [];
     private readonly Func<HttpContext, Error, Task> _onError = (context, error) => Task.CompletedTask;
 
     public CelmahExceptionLogger(ErrorLog errorLog, IErrorFactory errorFactory, IOptions<CelmahOptions> elmahOptions, ILogger<CelmahExceptionLogger> logger)

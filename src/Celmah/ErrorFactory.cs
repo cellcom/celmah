@@ -270,15 +270,13 @@ internal sealed class ErrorFactory : IErrorFactory
 
     private static NameValueCollection? CopyCollection(IEnumerable<KeyValuePair<string, StringValues>>? collection)
     {
-        // ReSharper disable once PossibleMultipleEnumeration
-        if (collection is null || !collection.Any())
+        if (collection is null)
         {
             return null;
         }
 
-        // ReSharper disable once PossibleMultipleEnumeration
         var keyValuePairs = collection as KeyValuePair<string, StringValues>[] ?? collection.ToArray();
-        if (!keyValuePairs.Any())
+        if (keyValuePairs.Length == 0)
         {
             return null;
         }
@@ -317,20 +315,16 @@ internal sealed class ErrorFactory : IErrorFactory
     {
         var ct = context.Request.ContentType?.ToLower();
         var tEnc = string.Join(",", context.Request.Headers[HeaderNames.TransferEncoding].ToArray());
-        if (string.IsNullOrEmpty(ct) || tEnc.Contains("chunked") || !SupportedContentTypes.Any(i => ct.Contains(ct)))
+        if (string.IsNullOrEmpty(ct) || tEnc.Contains("chunked") || !SupportedContentTypes.Any(i => ct.Contains(i)))
         {
             return null;
         }
 
         context.Request.EnableBuffering();
-        var body = context.Request.Body;
-        var buffer = new byte[Convert.ToInt32(context.Request.ContentLength)];
-
-        // ReSharper disable once MustUseReturnValue
-        await context.Request.Body.ReadAsync(buffer);
-        var bodyAsText = Encoding.UTF8.GetString(buffer);
-        body.Seek(0, SeekOrigin.Begin);
-        context.Request.Body = body;
+        using var ms = new MemoryStream();
+        await context.Request.Body.CopyToAsync(ms);
+        var bodyAsText = Encoding.UTF8.GetString(ms.ToArray());
+        context.Request.Body.Position = 0;
 
         return bodyAsText;
     }
