@@ -13,15 +13,16 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import ErrorDetail from '@/components/ErrorDetail.vue'
 import ErrorsList from '@/components/ErrorsList.vue'
+import type { ErrorListItem } from '@/types'
 
-const selected = ref(null)
+const selected = ref<ErrorListItem | null>(null)
 const collapsed = ref(false)
 
-function onSelect(item) {
+function onSelect(_item: ErrorListItem) {
   collapsed.value = window.innerWidth <= 1024 ? !collapsed.value : false
 }
 </script>

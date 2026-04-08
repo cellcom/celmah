@@ -15,6 +15,6 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { toasts, remove } from './toast-service'
 </script>

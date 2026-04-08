@@ -48,7 +48,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { FilterIcon, SearchIcon } from 'lucide-vue-next'
 import { useErrorStore } from './store'
@@ -58,7 +58,7 @@ const store = useErrorStore()
 const searchText = ref('')
 const showFilterModal = ref(false)
 
-const celmahRoot = computed(() => window.$celmah_root)
+const celmahRoot = computed(() => (window as any).$celmah_root as string)
 
 function search() {
   store.setSearchText(searchText.value)

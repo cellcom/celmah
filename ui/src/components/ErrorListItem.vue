@@ -19,14 +19,19 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { timeAgo } from '@/utils'
+import type { ErrorDetail } from '@/types'
 
-const props = defineProps({
-  item: { type: Object, default: () => ({}) },
-  id: { type: String, default: '' },
-  isSelected: { type: Boolean, default: false },
+const props = withDefaults(defineProps<{
+  item?: ErrorDetail
+  id?: string
+  isSelected?: boolean
+}>(), {
+  item: () => ({} as ErrorDetail),
+  id: '',
+  isSelected: false,
 })
 
 const emit = defineEmits(['select'])

@@ -11,8 +11,8 @@ const routes = [
   { path: '/:pathMatch(.*)*', redirect: { name: 'Errors' } },
 ]
 
-function getBase() {
-  const meta = document.querySelector('meta[name="celmah-root"]')
+function getBase(): string {
+  const meta = document.querySelector('meta[name="celmah-root"]') as HTMLMetaElement | null
   return meta ? meta.content : '/celmah'
 }
 

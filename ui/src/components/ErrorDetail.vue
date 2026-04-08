@@ -279,25 +279,29 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { CopyIcon, ExternalLinkIcon, FilterIcon, InfoIcon } from 'lucide-vue-next'
 import { api, getCelmahRoot } from '@/api'
 import { countryCodeToFlag, dateSubstring, formatTime } from '@/utils'
 import { showToast } from './toast-service'
 import { useErrorStore } from '@/store'
 import HighlightCode from './HighlightCode.vue'
+import type { ErrorDetail as ErrorDetailType, HelpHtmlResponse, CountryInfo, ErrorSource, MessageLogEntry } from '@/types'
 
-const props = defineProps({
-  item: { type: Object, default: () => ({}) },
-  id: { type: String, default: '' },
+const props = withDefaults(defineProps<{
+  item?: ErrorDetailType
+  id?: string
+}>(), {
+  item: () => ({} as ErrorDetailType),
+  id: '',
 })
 
-const emit = defineEmits(['back'])
+const emit = defineEmits<{ back: [] }>()
 
 const store = useErrorStore()
-const countryInfo = ref({})
-const helpHtml = ref(null)
+const countryInfo = ref<CountryInfo>({} as CountryInfo)
+const helpHtml = ref<HelpHtmlResponse | null>(null)
 const selectedTab = ref(0)
 const isMobile = ref(window.innerWidth <= 1024)
 
@@ -353,11 +357,11 @@ const visibleTabs = computed(() => {
   return tabs
 })
 
-function getTabIndex(key) {
+function getTabIndex(key: string): number {
   return visibleTabs.value.findIndex(t => t.key === key)
 }
 
-function levelString(level) {
+function levelString(level: number): string {
   switch (level) {
     case 0: return 'Trace'
     case 1: return 'Debug'
@@ -369,17 +373,17 @@ function levelString(level) {
   }
 }
 
-function formatSourceCode(code) {
+function formatSourceCode(code: ErrorSource): string {
   return (code.preContextCode || '') + '\n' +
     (code.contextCode || '') + '// Error in this line at ' + code.fileName + ' (' + code.line + ')\n' +
     (code.postContextCode || '')
 }
 
-function addFilter(property, condition, value) {
+function addFilter(property: string, condition: string, value: string | number): void {
   store.addFilterTag(property + ' ' + condition + ' ' + String(value).trim())
 }
 
-function copyTextToClipboard() {
+function copyTextToClipboard(): void {
   let text = `URL: (${props.item.method}) ${props.item.url}
 Hostname: ${props.item.hostName}
 Status Code: ${props.item.statusCode}
@@ -429,9 +433,9 @@ ${props.item.detail}
   )
 }
 
-function handleResize() {
+function handleResize(): void {
   isMobile.value = window.innerWidth <= 1024
-  const tabs = document.getElementsByClassName('tab-content-area')
+  const tabs = document.getElementsByClassName('tab-content-area') as HTMLCollectionOf<HTMLElement>
   if (!tabs || !tabs.length) return
   const height = window.innerHeight - tabs[0].offsetTop - 10
   tabs[0].style.height = window.innerWidth <= 1024 ? 'auto' : height + 'px'

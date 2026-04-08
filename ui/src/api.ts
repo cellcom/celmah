@@ -4,7 +4,7 @@ axios.defaults.headers['x-requested-with'] = 'XMLHttpRequest'
 
 export const api = axios.create()
 
-export function getCelmahRoot() {
-  const meta = document.querySelector('meta[name="celmah-root"]')
+export function getCelmahRoot(): string {
+  const meta = document.querySelector('meta[name="celmah-root"]') as HTMLMetaElement | null
   return meta ? meta.content : '/celmah'
 }

@@ -2,16 +2,19 @@
   <pre class="hljs-pre"><code ref="codeEl" :class="'language-' + lang">{{ code }}</code></pre>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { hljs } from '@/utils'
 
-const props = defineProps({
-  lang: { type: String, default: 'json' },
-  code: { type: String, default: '' },
+const props = withDefaults(defineProps<{
+  lang?: string
+  code?: string
+}>(), {
+  lang: 'json',
+  code: '',
 })
 
-const codeEl = ref(null)
+const codeEl = ref<HTMLElement | null>(null)
 
 function highlight() {
   if (codeEl.value) {

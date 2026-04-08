@@ -3,26 +3,26 @@ import { defineStore } from 'pinia'
 export const useErrorStore = defineStore('errors', {
   state: () => ({
     searchText: '',
-    filterTags: [],
+    filterTags: [] as string[],
   }),
   getters: {
-    filtersHash(state) {
+    filtersHash(state): string {
       return state.filterTags.join(' | ')
     },
   },
   actions: {
-    setSearchText(text) {
+    setSearchText(text: string) {
       this.searchText = text
     },
-    setFilterTags(tags) {
+    setFilterTags(tags: string[]) {
       this.filterTags = [...tags]
     },
-    addFilterTag(tag) {
+    addFilterTag(tag: string) {
       if (!this.filterTags.includes(tag)) {
         this.filterTags.push(tag)
       }
     },
-    removeFilterTag(tag) {
+    removeFilterTag(tag: string) {
       this.filterTags = this.filterTags.filter(t => t !== tag)
     },
     clearFilterTags() {

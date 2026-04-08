@@ -11,11 +11,11 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
-// Mount ToastContainer as a sibling of App
-const root = document.getElementById('app')
+// Mount App
+const root = document.getElementById('app')!
 app.mount(root)
 
-// Create toast container outside app
+// Mount ToastContainer as a sibling of App
 const toastDiv = document.createElement('div')
 toastDiv.id = 'toast-root'
 document.body.appendChild(toastDiv)

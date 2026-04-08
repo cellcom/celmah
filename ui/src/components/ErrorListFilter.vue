@@ -69,21 +69,21 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useErrorStore } from '@/store'
 
-const emit = defineEmits(['close'])
+const emit = defineEmits<{ close: [] }>()
 const store = useErrorStore()
 
 const showModal = ref(true)
 const filterProperty = ref('message')
 const filterCondition = ref('=')
 const textValue = ref('')
-const dateValue = ref(null)
-const timeValue = ref(null)
+const dateValue = ref<string | null>(null)
+const timeValue = ref<string | null>(null)
 const editMode = ref(false)
-const editingTag = ref(null)
+const editingTag = ref<string | null>(null)
 
 const properties = [
   { value: 'application', text: 'Application' },
@@ -125,19 +125,19 @@ watch(isDateTime, (v) => {
   }
 })
 
-function close() {
+function close(): void {
   emit('close')
 }
 
-function clearAll() {
+function clearAll(): void {
   store.clearFilterTags()
 }
 
-function removeTag(tag) {
+function removeTag(tag: string): void {
   store.removeFilterTag(tag)
 }
 
-function toTag(property, condition, text, date, time) {
+function toTag(property: string, condition: string, text: string | null, date: string | null, time: string | null): string {
   let tag = property + ' ' + condition + ' '
   if (date) {
     tag += date
@@ -148,7 +148,7 @@ function toTag(property, condition, text, date, time) {
   return tag.trim()
 }
 
-function submit() {
+function submit(): void {
   const tag = toTag(
     filterProperty.value,
     filterCondition.value,
@@ -163,7 +163,7 @@ function submit() {
   close()
 }
 
-function editTag(tag) {
+function editTag(tag: string): void {
   const match = tag.match(/([^\s]*)\s+([^\s]*)\s+(.*)/)
   if (!match) return
   filterProperty.value = match[1]
@@ -183,7 +183,7 @@ function editTag(tag) {
 }
 
 // Expose addFilterTag for programmatic use from child components
-function addFilterTag(tag) {
+function addFilterTag(tag: string): void {
   store.addFilterTag(tag)
 }
 

@@ -11,7 +11,7 @@
         :class="{ gray: index % 2 === 0 }"
         :item="item.error"
         :id="item.id"
-        :is-selected="selected && selected.id === item.id"
+        :is-selected="!!selected && selected.id === item.id"
         @select="selectItem(item)"
       />
     </div>
@@ -22,26 +22,27 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useErrorStore } from '@/store'
 import { api, getCelmahRoot } from '@/api'
 import { showToast } from './toast-service'
 import ErrorListItem from './ErrorListItem.vue'
+import type { ErrorListItem as ErrorListItemType, ErrorsResponse } from '@/types'
 
-const emit = defineEmits(['select'])
+const emit = defineEmits<{ select: [item: ErrorListItemType] }>()
 
 const store = useErrorStore()
-const scrollEl = ref(null)
-const items = ref([])
+const scrollEl = ref<HTMLElement | null>(null)
+const items = ref<ErrorListItemType[]>([])
 const totalCount = ref(0)
 const loading = ref(false)
 const errorIndex = ref(0)
 const loaded = ref(false)
-const loadTimerId = ref(null)
+const loadTimerId = ref<ReturnType<typeof setTimeout> | null>(null)
 const loadNewTimerStarted = ref(false)
 const filtersHash = ref('')
-const selected = defineModel('selected')
+const selected = defineModel<ErrorListItemType | null>('selected')
 
 watch(() => store.searchText, () => loadErrors())
 watch(() => store.filterTags, () => {
@@ -62,13 +63,13 @@ onBeforeUnmount(() => {
   if (loadTimerId.value) clearTimeout(loadTimerId.value)
 })
 
-function handleResize() {
+function handleResize(): void {
   if (!scrollEl.value) return
   const height = window.innerHeight - scrollEl.value.offsetTop - 30
   scrollEl.value.style.height = height + 'px'
 }
 
-function setupScroll() {
+function setupScroll(): void {
   const el = scrollEl.value
   if (!el) return
   el.onscroll = () => {
@@ -80,7 +81,7 @@ function setupScroll() {
   }
 }
 
-function loadMore() {
+function loadMore(): void {
   loading.value = true
   api.get(`${getCelmahRoot()}/api/errors?i=${errorIndex.value}&s=50`)
     .then(response => {
@@ -100,7 +101,7 @@ function loadMore() {
     })
 }
 
-function loadErrors() {
+function loadErrors(): void {
   if (loadTimerId.value != null) {
     clearTimeout(loadTimerId.value)
     loadTimerId.value = null
@@ -131,7 +132,7 @@ function loadErrors() {
     })
 }
 
-function loadNewErrors() {
+function loadNewErrors(): void {
   const filterTags = store.filterTags
   const searchText = store.searchText
   const id = items.value.length > 0 ? items.value[0].id : ''
@@ -155,7 +156,7 @@ function loadNewErrors() {
     })
 }
 
-function selectItem(item) {
+function selectItem(item: ErrorListItemType): void {
   selected.value = item
   emit('select', item)
 }
