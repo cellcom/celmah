@@ -106,7 +106,7 @@ Current approach (no magic strings):
 ## Remaining Work
 
 - [ ] Create repo on GitHub (`cellcom/celmah`)
-- [ ] Add remaining packages to build scripts (MySql, Redis, Serilog)
+- [x] Add remaining packages to build scripts (MySql, Redis, Serilog)
 - [ ] Test with a real ASP.NET app consuming the local NuGet packages
 - [ ] Test behind reverse proxy (PathBase scenario)
 - [ ] Decide on version number for nuget.org (1.0.0 vs 10.0.0)
