@@ -105,7 +105,7 @@ internal sealed class ErrorLogMiddleware
             || context.Response.ContentLength.HasValue
             || !string.IsNullOrEmpty(context.Response.ContentType)
             || context.RequestAborted.IsCancellationRequested
-            || _options.Value.IgnoredStatusCodes.Contains(context.Response.StatusCode))
+            || (_options.Value.IgnoredStatusCodes is { Length: > 0 } codes && codes.Contains(context.Response.StatusCode)))
         {
             return;
         }

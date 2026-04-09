@@ -23,8 +23,6 @@ public class IndexModel : PageModel
         await this.HttpContext.RaiseErrorAsync(new Exception("test2"));
 
         var r = 0;
-        // ReSharper disable once UnusedVariable
-        // ReSharper disable once IntDivisionByZero
-        var d = 100 / r;
+        _ = 100 / r;
     }
 }

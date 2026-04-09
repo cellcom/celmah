@@ -70,7 +70,7 @@ app.MapCelmah(); // <- Add this to register Celmah endpoints
 | Notifiers             | IErrorNotifier[]               | empty                                   | A collection of [`IErrorNotifier`](#using-notifiers) instances to send notifications on errors |
 | OnError               | Func<HttpContext, Error, Task> | empty                                   | Callback that is executed before error is logged. Consumer can add or remove content to be logged in this callback. |
 | ShowCelmahErrorPage   | bool                           | `false`                                 | Displays the Celmah UI when an error is captured                           |
-| IgnoredStatusCodes    | HashSet\<int>                  | `empty`                                 | HTTP status codes to skip when logging synthetic errors from response status codes (e.g. `[404]` to suppress 404 logs) |
+| IgnoredStatusCodes    | int[]                          | `empty`                                 | HTTP status codes to skip when logging synthetic errors from response status codes (e.g. `[404]` to suppress 404 logs) |
 | SourcePaths           | string[]                       | empty                                   | Paths to source code to enrich stack traces                                |
 
 **TIP**: :information_source: Celmah options work well with environment specific `appsettings` files. A `Configure` method exists on the builder to enable binding configuration to Celmah options.
