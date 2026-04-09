@@ -61,6 +61,13 @@ public class CelmahOptions
     public bool ShowCelmahErrorPage { get; set; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether to enable IP address geo-lookup via ip-api.com in the error detail UI.
+    ///     Requires outbound HTTP access and CSP that allows connect-src to http://ip-api.com.
+    ///     Default is <c>false</c> (disabled).
+    /// </summary>
+    public bool EnableIpGeoLookup { get; set; }
+
+    /// <summary>
     ///     HTTP status codes to ignore when logging synthetic errors from response status codes.
     ///     For example, set to [404] to skip logging 404 Not Found errors.
     ///     Default is empty (log all status codes).

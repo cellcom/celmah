@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Celmah.Handlers;
 
@@ -35,7 +37,8 @@ internal static partial class Endpoints
         var html = await reader.ReadToEndAsync();
 
         // Inject meta tag for JS to read the runtime root path
-        html = html.Replace("<head>", $"<head><meta name=\"celmah-root\" content=\"{celmahRoot}\">");
+        var celmahOptions = context.RequestServices.GetRequiredService<IOptions<CelmahOptions>>();
+        html = html.Replace("<head>", $"<head><meta name=\"celmah-root\" content=\"{celmahRoot}\"><meta name=\"celmah-ip-geo\" content=\"{(celmahOptions.Value.EnableIpGeoLookup ? "true" : "false")}\">");
 
         // Rewrite relative asset paths to absolute so they work from any client-side route
         // e.g. src="./assets/index.js" → src="/celmah/assets/index.js"

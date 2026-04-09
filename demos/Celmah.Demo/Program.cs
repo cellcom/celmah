@@ -6,7 +6,7 @@ builder.Host.UseCelmah((_, celmah) =>
 {
     celmah.UseCelmahExceptionPage();
     celmah.PersistToMemory();
-    celmah.Configure(o => o.IgnoredStatusCodes = [404]);
+    celmah.Configure(o => { o.IgnoredStatusCodes = [404]; o.EnableIpGeoLookup = true; });
 });
 
 var app = builder.Build();
