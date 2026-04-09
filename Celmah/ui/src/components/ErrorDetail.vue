@@ -458,11 +458,6 @@ watch(() => props.item, () => {
       .then(response => helpHtml.value = response.data)
       .catch(e => console.log(e))
   }
-  if (props.item.client && !props.item.client.startsWith(':')) {
-    api.get('http://ip-api.com/json/' + props.item.client)
-      .then(response => countryInfo.value = response.data)
-      .catch(e => console.log(e))
-  }
   selectedTab.value = 0
 }, { immediate: true })
 

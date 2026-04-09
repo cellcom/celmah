@@ -113,15 +113,26 @@ internal static partial class Endpoints
         entry.Size = 1;
 
         var url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/" + ((string)entry.Key)[6..];
-        var web = new HtmlWeb();
-        var doc = await web.LoadFromWebAsync(url);
-        var nodes = doc.DocumentNode.SelectNodes("//article[@class='article']/div");
+
+        HtmlDocument? doc = null;
+        try
+        {
+            var web = new HtmlWeb();
+            doc = await web.LoadFromWebAsync(url);
+        }
+        catch
+        {
+            // Network error (firewall, timeout, etc.) — don't cache
+            entry.AbsoluteExpiration = DateTimeOffset.Now;
+            return "{}";
+        }
+        var nodes = doc?.DocumentNode.SelectNodes("//article[@class='article']/div");
         if (nodes == null)
         {
             return "{}";
         }
 
-        var links = doc.DocumentNode.SelectNodes("//article[@class='article']/div//a");
+        var links = doc!.DocumentNode.SelectNodes("//article[@class='article']/div//a");
 
         if (links != null)
         {
