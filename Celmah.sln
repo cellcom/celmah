@@ -10,21 +10,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		version.json = version.json
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.SqlServer", "src\Celmah.SqlServer\Celmah.SqlServer.csproj", "{BCE602D7-1ABB-42F5-BC1F-77F7C1985708}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.SqlServer", "Celmah.SqlServer\Celmah.SqlServer.csproj", "{BCE602D7-1ABB-42F5-BC1F-77F7C1985708}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.Common", "src\Celmah.Common\Celmah.Common.csproj", "{0F75E1E4-32CB-47A5-8548-2798FFBAC4B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.Common", "Celmah.Common\Celmah.Common.csproj", "{0F75E1E4-32CB-47A5-8548-2798FFBAC4B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah", "src\Celmah\Celmah.csproj", "{BF039A92-379C-41E5-A8D2-6C26DAEFDC60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah", "Celmah\Celmah.csproj", "{BF039A92-379C-41E5-A8D2-6C26DAEFDC60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.Postgresql", "src\Celmah.Postgresql\Celmah.Postgresql.csproj", "{75B6FE36-D765-4685-9AA6-5878002A5290}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.Postgresql", "Celmah.Postgresql\Celmah.Postgresql.csproj", "{75B6FE36-D765-4685-9AA6-5878002A5290}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.MySql", "src\Celmah.MySql\Celmah.MySql.csproj", "{DA992081-7177-4153-81CF-A726EEADC730}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.MySql", "Celmah.MySql\Celmah.MySql.csproj", "{DA992081-7177-4153-81CF-A726EEADC730}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.Tests", "Tests\Celmah.Tests\Celmah.Tests.csproj", "{B54072F0-F35A-424C-A153-286152BA9272}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.Serilog", "src\Celmah.Serilog\Celmah.Serilog.csproj", "{D7BCE4B3-7058-4DED-8C5D-ABC4F5324BB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.Serilog", "Celmah.Serilog\Celmah.Serilog.csproj", "{D7BCE4B3-7058-4DED-8C5D-ABC4F5324BB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.Redis", "src\Celmah.Redis\Celmah.Redis.csproj", "{F8636D99-C0A1-4AA6-874A-9F7B2B3C00CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celmah.Redis", "Celmah.Redis\Celmah.Redis.csproj", "{F8636D99-C0A1-4AA6-874A-9F7B2B3C00CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Celmah.Demo", "demos\Celmah.Demo\Celmah.Demo.csproj", "{550A3DB4-E6E5-B919-D179-FF5AB6E8435C}"
 EndProject

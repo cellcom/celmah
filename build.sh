@@ -50,18 +50,18 @@ done
 
 # --- Package lists ---
 ALL_PACKAGES=(
-  "src/Celmah.Common/Celmah.Common.csproj"
-  "src/Celmah/Celmah.csproj"
-  "src/Celmah.SqlServer/Celmah.SqlServer.csproj"
-  "src/Celmah.Postgresql/Celmah.Postgresql.csproj"
-  "src/Celmah.MySql/Celmah.MySql.csproj"
-  "src/Celmah.Redis/Celmah.Redis.csproj"
-  "src/Celmah.Serilog/Celmah.Serilog.csproj"
+  "Celmah.Common/Celmah.Common.csproj"
+  "Celmah/Celmah.csproj"
+  "Celmah.SqlServer/Celmah.SqlServer.csproj"
+  "Celmah.Postgresql/Celmah.Postgresql.csproj"
+  "Celmah.MySql/Celmah.MySql.csproj"
+  "Celmah.Redis/Celmah.Redis.csproj"
+  "Celmah.Serilog/Celmah.Serilog.csproj"
 )
 
 CORE_PACKAGES=(
-  "src/Celmah.Common/Celmah.Common.csproj"
-  "src/Celmah/Celmah.csproj"
+  "Celmah.Common/Celmah.Common.csproj"
+  "Celmah/Celmah.csproj"
 )
 
 if [ "$CORE_ONLY" = true ]; then
@@ -87,10 +87,10 @@ echo ""
 # --- 1. Build the Vue SPA ---
 if [ "$SKIP_SPA" = false ]; then
   echo ">>> Building Vue SPA..."
-  cd "$REPO_ROOT/ui"
+  cd "$REPO_ROOT/Celmah/ui"
   bun install
   bun run build
-  echo "    SPA built → src/Celmah/wwwroot/"
+  echo "    SPA built → Celmah/wwwroot/"
   echo ""
 fi
 
