@@ -458,7 +458,7 @@ watch(() => props.item, () => {
       .then(response => helpHtml.value = response.data)
       .catch(e => console.log(e))
   }
-  const ipGeoEnabled = document.querySelector('meta[name="celmah-ip-geo"]')?.content === 'true'
+  const ipGeoEnabled = (document.querySelector('meta[name="celmah-ip-geo"]') as HTMLMetaElement | null)?.content === 'true'
   if (ipGeoEnabled && props.item.client && !props.item.client.startsWith(':')) {
     api.get('http://ip-api.com/json/' + props.item.client)
       .then(response => countryInfo.value = response.data)

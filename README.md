@@ -71,6 +71,7 @@ app.MapCelmah(); // <- Add this to register Celmah endpoints
 | OnError               | Func<HttpContext, Error, Task> | empty                                   | Callback that is executed before error is logged. Consumer can add or remove content to be logged in this callback. |
 | ShowCelmahErrorPage   | bool                           | `false`                                 | Displays the Celmah UI when an error is captured                           |
 | IgnoredStatusCodes    | int[]                          | `empty`                                 | HTTP status codes to skip when logging synthetic errors from response status codes (e.g. `[404]` to suppress 404 logs) |
+| EnableIpGeoLookup     | bool                           | `false`                                 | Enable IP address geo-lookup (country flag) in error detail UI via `ip-api.com`. Requires outbound HTTP and permissive CSP. |
 | SourcePaths           | string[]                       | empty                                   | Paths to source code to enrich stack traces                                |
 
 **TIP**: :information_source: Celmah options work well with environment specific `appsettings` files. A `Configure` method exists on the builder to enable binding configuration to Celmah options.
