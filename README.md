@@ -99,8 +99,8 @@ suppress specific status codes (e.g. 404 Not Found) to reduce noise in productio
 ```csharp
 builder.Host.UseCelmah((_, celmah) =>
 {
-    celmah.IgnoredStatusCodes = [404];              // skip 404s
-    // celmah.IgnoredStatusCodes = [404, 401, 403]; // skip multiple
+    celmah.Configure(o => o.IgnoredStatusCodes = [404]);              // skip 404s
+    // celmah.Configure(o => o.IgnoredStatusCodes = [404, 401, 403]); // skip multiple
 });
 ```
 
