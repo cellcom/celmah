@@ -21,6 +21,16 @@
     <RepositoryType>git</RepositoryType>
 
     <RollForward>LatestMinor</RollForward>
+
+    <!--
+      Versioning:
+        VersionPrefix = base version (major.minor.patch)
+        VersionSuffix = appended with '-' for prerelease, e.g. "alpha.42" → "1.0.0-alpha.42"
+        Leave VersionSuffix empty for stable releases.
+        Build scripts auto-set VersionSuffix to "dev.{timestamp}" for local feeds.
+    -->
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(VersionSuffix)' == ''">alpha.1</VersionSuffix>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 

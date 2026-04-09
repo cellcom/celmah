@@ -12,12 +12,14 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 LOCAL_FEED="${1:-/mnt/c/git/nuget/Celmah}"
 CONFIG="Release"
+VERSION_SUFFIX="dev.$(date +%Y%m%d%H%M%S)"
 
 echo "========================================"
 echo " Celmah – Local NuGet Build"
 echo "========================================"
 echo "Repo root : $REPO_ROOT"
 echo "Local feed: $LOCAL_FEED"
+echo "Version   : 1.0.0-$VERSION_SUFFIX"
 echo ""
 
 # --- 1. Build the Vue SPA ---
@@ -44,8 +46,8 @@ PACKAGES=(
 )
 
 for proj in "${PACKAGES[@]}"; do
-  echo "    dotnet pack $proj -c $CONFIG"
-  dotnet pack "$proj" -c "$CONFIG"
+  echo "    dotnet pack $proj -c $CONFIG -p:VersionSuffix=$VERSION_SUFFIX"
+  dotnet pack "$proj" -c "$CONFIG" -p:VersionSuffix="$VERSION_SUFFIX"
 done
 echo ""
 
@@ -64,6 +66,7 @@ echo ""
 echo "========================================"
 echo " Done! Packages published to:"
 echo "   $LOCAL_FEED"
+echo "   Version: 1.0.0-$VERSION_SUFFIX"
 echo ""
 echo " Generated packages:"
 ls -1 "$LOCAL_FEED"/*.nupkg 2>/dev/null | xargs -n1 basename
