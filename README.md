@@ -310,6 +310,31 @@ builder.Host.UseCelmah((builderContext, celmah) =>
 | `Celmah.Redis`       | Redis error log persistence              |
 | `Celmah.Serilog`     | Serilog sink for Celmah                  |
 
+## Project Structure
+
+```
+celmah/
+├── Celmah/                       # Core library + Vue SPA UI
+│   ├── Handlers/                 # API & resource handlers
+│   ├── Configuration/            # Builder & service extensions
+│   ├── ui/                       # Vue 3 + TypeScript SPA source
+│   │   ├── src/                  #   Vue components, styles, API
+│   │   └── public/               #   Favicons
+│   └── wwwroot/                  # Built SPA output (gitignored)
+├── Celmah.Common/                # Shared types & abstractions
+├── Celmah.SqlServer/             # SQL Server persistence
+├── Celmah.Postgresql/            # PostgreSQL persistence
+├── Celmah.MySql/                 # MySQL persistence
+├── Celmah.Redis/                 # Redis persistence
+├── Celmah.Serilog/               # Serilog sink
+├── Tests/Celmah.Tests/           # Unit tests
+├── demos/Celmah.Demo/            # Demo app (memory persistence)
+├── build.sh                      # Build, pack & publish script
+├── Directory.Build.props         # Shared MSBuild properties
+├── version.json                  # Root NB.GV version
+└── nuget.config                  # Local feed configuration
+```
+
 ## Building from Source
 
 ### Prerequisites
@@ -317,36 +342,48 @@ builder.Host.UseCelmah((builderContext, celmah) =>
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Bun](https://bun.sh/) (for building the Vue SPA)
 
-### Build everything
+### Using build.sh
 
 ```shell
-./build-and-publish-local.sh
+# Build all packages (SPA + core + extensions)
+./build.sh
+
+# Build only Celmah + Celmah.Common
+./build.sh --core
+
+# Build and publish to local feed
+./build.sh --push
+./build.sh --core --push
+
+# Skip SPA rebuild (e.g. only C# changed)
+./build.sh --skip-spa
+
+# Custom feed path
+./build.sh --push /path/to/feed
 ```
 
-This script will:
+The script will:
 
-1. **Build the Vue SPA** (`ui/` → `src/Celmah/wwwroot/`)
-2. **Pack all NuGet packages** into `artifacts/package/release/`
-3. **Publish** them to the local feed at `/mnt/c/git/nuget/Celmah`
+1. **Build the Vue SPA** (`Celmah/ui/` → `Celmah/wwwroot/`)
+2. **Pack NuGet packages** into `artifacts/package/release/`
+3. **Publish** to local feed (when `--push` is used)
 
 ### Manual step-by-step
 
 ```shell
 # 1. Build the Vue frontend
-cd ui
+cd Celmah/ui
 bun install
 bun run build
-cd ..
+cd ../..
 
 # 2. Pack individual projects
-dotnet pack src/Celmah/Celmah.csproj -c Release
-dotnet pack src/Celmah.SqlServer/Celmah.SqlServer.csproj -c Release
-dotnet pack src/Celmah.Postgresql/Celmah.Postgresql.csproj -c Release
+dotnet pack Celmah/Celmah.csproj -c Release
+dotnet pack Celmah.Common/Celmah.Common.csproj -c Release
+dotnet pack Celmah.SqlServer/Celmah.SqlServer.csproj -c Release
 
 # 3. Publish to local feed
-dotnet nuget push artifacts/package/release/Celmah.1.0.0.nupkg --source /mnt/c/git/nuget/Celmah
-dotnet nuget push artifacts/package/release/Celmah.SqlServer.1.0.0.nupkg --source /mnt/c/git/nuget/Celmah
-dotnet nuget push artifacts/package/release/Celmah.Postgresql.1.0.0.nupkg --source /mnt/c/git/nuget/Celmah
+dotnet nuget push artifacts/package/release/Celmah.*.nupkg --source /mnt/c/git/nuget/Celmah
 ```
 
 ### Consuming local packages
@@ -379,7 +416,13 @@ This fork diverges from [jrsearles/Elmah.AspNetCore](https://github.com/jrsearle
 - **Targets .NET 10 only** (upstream targets .NET 6+)
 - **Updated NuGet package dependencies** to latest versions
 - **Removed multi-targeting** — single `net10.0` TFM
-- **Local NuGet feed** support via `build-and-publish-local.sh`
+- **Nerdbank.GitVersioning** for automatic versioning based on git commits
+- **Flattened project layout** — all `.csproj` at repo root (no `src/` directory)
+- **SPA lives inside `Celmah/ui/`** — UI changes automatically bump the core package version
+- **Consolidated build script** (`build.sh`) with `--core`, `--push`, `--skip-spa` flags
+- **IgnoredStatusCodes** option to suppress specific HTTP status code logging
+- **EnableIpGeoLookup** option for IP geo-lookup in error detail UI
+- **SPA API base path** reads `<meta name="celmah-root">` for reverse proxy support
 
 ## Migrating from Elmah.AspNetCore
 
