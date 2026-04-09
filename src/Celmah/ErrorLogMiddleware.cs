@@ -109,7 +109,9 @@ internal sealed class ErrorLogMiddleware
             return;
         }
 
-        var exception = new BadHttpRequestException("An error status was returned when processing the request", context.Response.StatusCode);
+        var statusCode = context.Response.StatusCode;
+        var reasonPhrase = Microsoft.AspNetCore.WebUtilities.ReasonPhrases.GetReasonPhrase(statusCode);
+        var exception = new BadHttpRequestException(reasonPhrase, statusCode);
         await _elmahLogger.LogExceptionAsync(context, exception);
     }
 }

@@ -110,6 +110,8 @@ internal static partial class Endpoints
 
     private static async Task<string> LoadAndCacheStatusAsync(ICacheEntry entry)
     {
+        entry.Size = 1;
+
         var url = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/" + ((string)entry.Key)[6..];
         var web = new HtmlWeb();
         var doc = await web.LoadFromWebAsync(url);

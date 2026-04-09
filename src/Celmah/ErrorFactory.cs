@@ -48,10 +48,14 @@ internal sealed class ErrorFactory : IErrorFactory
         int statusCode = GetStatusCodeFromExceptionOr500(e);
 
         //
-        // If this is an HTTP exception, then get the status code
-        // and detailed HTML message provided by the host.
+        // If this is an HTTP exception (synthetic status code error from middleware),
+        // set the type to "HTTP" like the original ELMAH did.
         //
-        if (baseException is HttpRequestException { StatusCode: not null } httpExc)
+        if (e is BadHttpRequestException)
+        {
+            typeName = "HTTP";
+        }
+        else if (baseException is HttpRequestException { StatusCode: not null } httpExc)
         {
             statusCode = (int)httpExc.StatusCode;
             baseException = baseException.InnerException;
