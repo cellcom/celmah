@@ -4,7 +4,6 @@
     <IsPackable>true</IsPackable>
     <Description>Celmah - SQL Server error log persistence</Description>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
   </ItemGroup>

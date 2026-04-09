@@ -13,9 +13,9 @@
 
 .filter-link {
   cursor: pointer;
-  color: $filter-link-color;
+  color: $accent-color;
   &:hover {
-    color: color.adjust($filter-link-color, $lightness: -10%);
+    color: $accent-hover;
   }
 }
 
@@ -23,4 +23,110 @@ pre {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+// ─── Dark mode ───────────────────────────────────────────────
+html[data-theme="dark"] {
+  body {
+    background-color: $dark-bg;
+    color: $dark-text;
+  }
+
+  // Navbar
+  .navbar-dark {
+    background-color: $dark-surface !important;
+  }
+
+  // List panel
+  .e-list {
+    background-color: $dark-surface-alt;
+    border-right-color: $dark-border;
+    .e-list-item {
+      border-bottom-color: $dark-border;
+      &:hover { background-color: color.adjust($dark-surface, $lightness: 5%); }
+      &.selected { background-color: color.adjust($info-bg, $lightness: -30%); }
+    }
+    .e-list-item-col1 {
+      color: $dark-text-muted;
+    }
+    .e-list-item-col2 {
+      color: $dark-text-muted;
+      .type { color: $dark-text; }
+    }
+    .total-count { color: $dark-text-muted; }
+  }
+
+  // Detail panel
+  .e-detail {
+    background-color: $dark-bg;
+    .item-details {
+      background-color: $dark-surface-alt;
+    }
+    .status {
+      color: $white !important;
+    }
+  }
+
+  // Tabs
+  .nav-tabs .nav-link {
+    color: $dark-text-muted;
+    &.active { color: $accent-color; }
+  }
+  .tab-pane-content {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    color: $dark-text;
+    table tr {
+      border-bottom-color: $dark-border;
+      th { color: $dark-text-muted; }
+    }
+  }
+
+  // Code blocks
+  .hljs-pre, pre {
+    background: $dark-surface !important;
+    color: $dark-text;
+  }
+
+  // MSDN help box
+  .msdn {
+    background-color: color.adjust($dark-surface, $lightness: 3%);
+    color: $dark-text;
+  }
+
+  // Filter link stays accent
+  .filter-link {
+    color: $accent-color;
+    &:hover { color: color.adjust($accent-color, $lightness: 15%); }
+  }
+
+  // Forms & inputs
+  .form-control, .form-select {
+    background-color: $dark-surface-alt;
+    border-color: $dark-border;
+    color: $dark-text;
+  }
+  .input-group-text {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    color: $dark-text-muted;
+  }
+
+  // Modal
+  .modal-content {
+    background-color: $dark-surface;
+    color: $dark-text;
+  }
+
+  // Toast
+  .toast { color: $white; }
+
+  // Badges
+  .badge.bg-info { background-color: $accent-color !important; }
+
+  // Method badge
+  .method-badge {
+    border-color: $dark-text-muted;
+    background-color: $dark-text-muted;
+  }
 }

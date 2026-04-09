@@ -146,7 +146,9 @@ public class XmlFileErrorLog : ErrorLog
             {
                 var entry = await LoadErrorLogEntryAsync(file, cancellationToken);
                 if (entry is not null)
+                {
                     entries.Add(entry);
+                }
             }
             totalCount = files.Length;
         }
@@ -157,7 +159,9 @@ public class XmlFileErrorLog : ErrorLog
             {
                 var entry = await LoadErrorLogEntryAsync(file, cancellationToken);
                 if (entry is not null && filters.IsMatch(entry))
+                {
                     fEntries.Add(entry);
+                }
             }
             totalCount = fEntries.Count;
 

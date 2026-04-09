@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="#">Celmah</a>
+      <router-link class="navbar-brand" :to="{ name: 'Errors' }">Celmah</router-link>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav-collapse">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -11,35 +11,39 @@
             <router-link class="nav-link" :to="{ name: 'Errors' }">Errors</router-link>
           </li>
           <li class="nav-item">
-            <a class="nav-link" target="_blank" :href="celmahRoot + '/rss'">RSS Feeds</a>
+            <a class="nav-link" target="_blank" :href="celmahRoot + '/rss'">RSS</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" target="_blank" :href="celmahRoot + '/digestrss'">RSS Digest</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" target="_blank" :href="celmahRoot + '/download'">Download Log</a>
+            <a class="nav-link" target="_blank" :href="celmahRoot + '/download'">Download</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" target="_blank" href="https://github.com/cellcom/celmah">Help</a>
-          </li>
-          <li class="nav-item">
-            <router-link class="nav-link" :to="{ name: 'About' }">About</router-link>
+            <a class="nav-link d-flex align-items-center" target="_blank" href="https://github.com/cellcom/celmah">
+              <GithubIcon :size="18" />
+            </a>
           </li>
         </ul>
-        <div v-if="$route.name === 'Errors'" class="d-flex align-items-center">
-          <button class="btn btn-light btn-sm me-2" @click="showFilterModal = true">
-            <FilterIcon :size="14" class="me-1" />
-            <span style="font-size: 0.9rem">Add Filter</span>
+        <div class="d-flex align-items-center gap-2">
+          <template v-if="$route.name === 'Errors'">
+            <button class="btn btn-outline-light btn-sm d-flex align-items-center" @click="showFilterModal = true" title="Add Filter">
+              <FilterIcon :size="14" />
+            </button>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><SearchIcon :size="14" /></span>
+              <input
+                class="form-control"
+                placeholder="Search"
+                v-model="searchText"
+                @keydown.enter.prevent="search"
+              />
+            </div>
+          </template>
+          <button class="btn btn-outline-light btn-sm ms-1 d-flex align-items-center" @click="toggleTheme" :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
+            <SunIcon v-if="isDark" :size="15" />
+            <MoonIcon v-else :size="15" />
           </button>
-          <div class="input-group input-group-sm">
-            <span class="input-group-text"><SearchIcon :size="14" /></span>
-            <input
-              class="form-control"
-              placeholder="Search"
-              v-model="searchText"
-              @keydown.enter.prevent="search"
-            />
-          </div>
         </div>
       </div>
     </nav>
@@ -49,20 +53,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { FilterIcon, SearchIcon } from 'lucide-vue-next'
+import { ref, computed, onMounted } from 'vue'
+import { FilterIcon, SearchIcon, GithubIcon, SunIcon, MoonIcon } from 'lucide-vue-next'
 import { useErrorStore } from './store'
 import ErrorListFilter from '@/components/ErrorListFilter.vue'
 
 const store = useErrorStore()
 const searchText = ref('')
 const showFilterModal = ref(false)
+const isDark = ref(false)
 
 const celmahRoot = computed(() => (window as any).$celmah_root as string)
 
 function search() {
   store.setSearchText(searchText.value)
 }
+
+function toggleTheme() {
+  isDark.value = !isDark.value
+  document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
+  localStorage.setItem('celmah-theme', isDark.value ? 'dark' : 'light')
+}
+
+onMounted(() => {
+  const saved = localStorage.getItem('celmah-theme')
+  if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    isDark.value = true
+    document.documentElement.setAttribute('data-theme', 'dark')
+  }
+})
 </script>
 
 <style lang="scss">
@@ -76,6 +95,7 @@ html, body {
   overflow-y: hidden;
 }
 
-// Expose ErrorListFilter ref for programmatic access from child components
-// via the global property pattern
+.navbar-brand {
+  font-weight: 600;
+}
 </style>

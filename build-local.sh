@@ -7,7 +7,6 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 CONFIG="Release"
-VERSION_SUFFIX="dev.$(date +%Y%m%d%H%M%S)"
 
 echo "========================================"
 echo " Celmah – Build"
@@ -36,11 +35,11 @@ PACKAGES=(
 )
 
 for proj in "${PACKAGES[@]}"; do
-  echo "    dotnet pack $proj -c $CONFIG -p:VersionSuffix=$VERSION_SUFFIX"
-  dotnet pack "$proj" -c "$CONFIG" -p:VersionSuffix="$VERSION_SUFFIX"
+  echo "    dotnet pack $proj -c $CONFIG"
+  dotnet pack "$proj" -c "$CONFIG"
 done
 
 echo ""
 echo "========================================"
-echo " Done! Version: 1.0.0-$VERSION_SUFFIX"
+echo " Done!"
 echo "========================================"

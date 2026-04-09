@@ -5,16 +5,16 @@
         <div>
           <div class="toolbar">
             <button class="btn btn-sm btn-primary" v-if="isMobile" @click="$emit('back')">&lt; Return to list</button>
-            <button class="btn btn-sm btn-outline-info" @click="copyTextToClipboard" title="Copy error">
+            <button class="btn btn-sm btn-outline-secondary" @click="copyTextToClipboard" title="Copy error">
               <CopyIcon :size="14" />
             </button>
-            <a class="btn btn-sm btn-outline-info" target="_blank" :href="celmahRoot + '/xml?id=' + id" title="Download as XML">
+            <a class="btn btn-sm btn-outline-secondary" target="_blank" :href="celmahRoot + '/xml?id=' + id" title="Download as XML">
               <span>xml</span>
             </a>
-            <a class="btn btn-sm btn-outline-info" target="_blank" :href="celmahRoot + '/json?id=' + id" title="Download as JSON">
+            <a class="btn btn-sm btn-outline-secondary" target="_blank" :href="celmahRoot + '/json?id=' + id" title="Download as JSON">
               <span>json</span>
             </a>
-            <a class="btn btn-sm btn-outline-info" target="_blank" :href="celmahRoot + '/detail/' + id" title="Open in new window">
+            <a class="btn btn-sm btn-outline-secondary" target="_blank" :href="celmahRoot + '/detail/' + id" title="Open in new window">
               <ExternalLinkIcon :size="14" />
             </a>
           </div>
@@ -33,7 +33,7 @@
                     <FilterIcon :size="14" />
                   </a>
                 </h3>
-                <h6 class="text-info filter-link-hid">
+                <h6 class="filter-link-hid" style="color: #6b7fa3">
                   {{ item.type }}
                   <a href="#" class="filter-link" @click.prevent="addFilter('type', '=', item.type)">
                     <FilterIcon :size="14" />
@@ -46,6 +46,7 @@
         <div class="item-details">
           <div class="item-details-tab">
             <table>
+              <tbody>
               <tr>
                 <th>Date/Time</th>
                 <td>
@@ -94,8 +95,10 @@
                   </a>
                 </td>
               </tr>
+              </tbody>
             </table>
             <table>
+              <tbody>
               <tr>
                 <th>Application</th>
                 <td class="filter-link-hid">
@@ -123,6 +126,7 @@
                   </a>
                 </td>
               </tr>
+              </tbody>
             </table>
           </div>
           <div class="spacer"></div>
@@ -258,6 +262,7 @@
         <div v-for="tabInfo in tableTabs" :key="tabInfo.key">
           <div v-if="selectedTab === getTabIndex(tabInfo.key)" class="tab-pane-content">
             <table>
+              <tbody>
               <tr v-for="(value, propertyName) in tabInfo.data" :key="propertyName">
                 <th>
                   {{ propertyName }}
@@ -271,6 +276,7 @@
                 </th>
                 <td>{{ value }}</td>
               </tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -590,10 +596,10 @@ span.error-line { color: red; font-weight: 600; }
           flex-direction: column;
           margin-right: 10px;
           font-weight: 500;
-          color: #17a2b8;
+          color: $info-text;
           align-items: center;
         }
-        .os svg, .browser svg { fill: #17a2b8; }
+        .os svg, .browser svg { fill: $info-text; }
 
         table {
           margin-right: 40px;

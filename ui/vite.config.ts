@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'node:path'
 
+const backendUrl = process.env.CELMAH_BACKEND ?? 'http://localhost:5232'
+
 export default defineConfig({
   plugins: [vue()],
   resolve: {
@@ -10,6 +12,15 @@ export default defineConfig({
     },
   },
   base: './',
+  server: {
+    port: 5173,
+    proxy: {
+      '/celmah': {
+        target: backendUrl,
+        changeOrigin: true,
+      },
+    },
+  },
   build: {
     outDir: path.resolve(__dirname, '../src/Celmah/wwwroot'),
     emptyOutDir: true,

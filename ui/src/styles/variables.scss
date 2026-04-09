@@ -1,7 +1,19 @@
 $black: #000;
+$white: #fff;
 $border-main-color: #dee2e6;
 $border-sc-color: #f3f2f1;
 $error-color: #ef4c4c;
 $warning-color: #e3ba00;
 $success-color: #080;
-$filter-link-color: #17a2b8;
+$accent-color: #4f6ef7;        // Indigo — links, filter icons, interactive elements
+$accent-hover: #3b5bdb;        // Darker indigo for hover
+$info-bg: #dbeafe;             // Light blue for detail panel bg
+$info-text: #3b5bdb;           // Blue for OS/browser labels
+
+// Dark mode overrides (applied via [data-theme="dark"] on <html>)
+$dark-bg: #1a1a2e;
+$dark-surface: #16213e;
+$dark-surface-alt: #1e2a4a;
+$dark-border: #2a3a5c;
+$dark-text: #e0e0e0;
+$dark-text-muted: #a0a0b0;
