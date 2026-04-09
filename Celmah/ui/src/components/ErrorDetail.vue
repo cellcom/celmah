@@ -574,7 +574,6 @@ span.error-line { color: red; font-weight: 600; }
       }
 
       .item-details {
-        background-color: #d1ecf1;
         display: flex;
         flex-direction: row;
         align-items: start;

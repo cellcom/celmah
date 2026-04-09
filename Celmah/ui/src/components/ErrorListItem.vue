@@ -60,7 +60,7 @@ function onSelect() {
     background-color: $border-sc-color;
   }
   &.selected {
-    background-color: #d1ecf1;
+    background-color: $info-bg;
   }
 
   .e-list-item-col1 {

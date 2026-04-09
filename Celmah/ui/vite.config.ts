@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'node:path'
 
-const backendUrl = process.env.CELMAH_BACKEND ?? 'http://localhost:5232'
+const backendUrl = process.env.CELMAH_BACKEND ?? 'http://localhost:52288'
 
 export default defineConfig({
   plugins: [vue()],

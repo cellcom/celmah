@@ -25,6 +25,10 @@ pre {
   word-wrap: break-word;
 }
 
+.item-details {
+  background-color: $info-bg;
+}
+
 // ─── Dark mode ───────────────────────────────────────────────
 html[data-theme="dark"] {
   body {
@@ -43,8 +47,8 @@ html[data-theme="dark"] {
     border-right-color: $dark-border;
     .e-list-item {
       border-bottom-color: $dark-border;
-      &:hover { background-color: color.adjust($dark-surface, $lightness: 5%); }
-      &.selected { background-color: color.adjust($info-bg, $lightness: -30%); }
+      &:hover { background-color: color.adjust($dark-surface, $lightness: 10%); }
+      &.selected { background-color: color.adjust($dark-surface, $lightness: 20%); }
     }
     .e-list-item-col1 {
       color: $dark-text-muted;
@@ -60,7 +64,7 @@ html[data-theme="dark"] {
   .e-detail {
     background-color: $dark-bg;
     .item-details {
-      background-color: $dark-surface-alt;
+      background-color: $dark-info-bg;
     }
     .status {
       color: $white !important;
