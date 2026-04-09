@@ -103,7 +103,8 @@ internal sealed class ErrorLogMiddleware
             || context.Response.StatusCode < 400
             || context.Response.StatusCode >= 600
             || context.Response.ContentLength.HasValue
-            || !string.IsNullOrEmpty(context.Response.ContentType))
+            || !string.IsNullOrEmpty(context.Response.ContentType)
+            || context.RequestAborted.IsCancellationRequested)
         {
             return;
         }
