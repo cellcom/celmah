@@ -61,6 +61,13 @@ public class CelmahOptions
     public bool ShowCelmahErrorPage { get; set; }
 
     /// <summary>
+    ///     HTTP status codes to ignore when logging synthetic errors from response status codes.
+    ///     For example, set to [404] to skip logging 404 Not Found errors.
+    ///     Default is empty (log all status codes).
+    /// </summary>
+    public HashSet<int> IgnoredStatusCodes { get; set; } = [];
+
+    /// <summary>
     ///     Gets or sets a value indicating whether to log SQL queries made during the request. (Default is <c>true</c>)
     /// </summary>
     public bool LogSqlQueries { get; set; } = true;

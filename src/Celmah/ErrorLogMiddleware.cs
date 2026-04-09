@@ -104,7 +104,8 @@ internal sealed class ErrorLogMiddleware
             || context.Response.StatusCode >= 600
             || context.Response.ContentLength.HasValue
             || !string.IsNullOrEmpty(context.Response.ContentType)
-            || context.RequestAborted.IsCancellationRequested)
+            || context.RequestAborted.IsCancellationRequested
+            || _options.Value.IgnoredStatusCodes.Contains(context.Response.StatusCode))
         {
             return;
         }
