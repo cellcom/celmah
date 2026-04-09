@@ -25,6 +25,7 @@ cd "$REPO_ROOT"
 rm -rf artifacts/package
 
 PACKAGES=(
+  "src/Celmah.Common/Celmah.Common.csproj"
   "src/Celmah/Celmah.csproj"
   "src/Celmah.SqlServer/Celmah.SqlServer.csproj"
   "src/Celmah.Postgresql/Celmah.Postgresql.csproj"

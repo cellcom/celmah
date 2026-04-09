@@ -34,6 +34,7 @@ cd "$REPO_ROOT"
 rm -rf artifacts/package
 
 PACKAGES=(
+  "src/Celmah.Common/Celmah.Common.csproj"
   "src/Celmah/Celmah.csproj"
   "src/Celmah.SqlServer/Celmah.SqlServer.csproj"
   "src/Celmah.Postgresql/Celmah.Postgresql.csproj"
@@ -81,6 +82,7 @@ cat << 'NUGETCONFIG'
 NUGETCONFIG
 echo ""
 echo "Then run:"
+echo "  dotnet add package Celmah.Common"
 echo "  dotnet add package Celmah"
 echo "  dotnet add package Celmah.SqlServer"
 echo "  dotnet add package Celmah.Postgresql"
