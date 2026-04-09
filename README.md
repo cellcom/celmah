@@ -70,6 +70,7 @@ app.MapCelmah(); // <- Add this to register Celmah endpoints
 | Notifiers             | IErrorNotifier[]               | empty                                   | A collection of [`IErrorNotifier`](#using-notifiers) instances to send notifications on errors |
 | OnError               | Func<HttpContext, Error, Task> | empty                                   | Callback that is executed before error is logged. Consumer can add or remove content to be logged in this callback. |
 | ShowCelmahErrorPage   | bool                           | `false`                                 | Displays the Celmah UI when an error is captured                           |
+| IgnoredStatusCodes    | HashSet\<int>                  | `empty`                                 | HTTP status codes to skip when logging synthetic errors from response status codes (e.g. `[404]` to suppress 404 logs) |
 | SourcePaths           | string[]                       | empty                                   | Paths to source code to enrich stack traces                                |
 
 **TIP**: :information_source: Celmah options work well with environment specific `appsettings` files. A `Configure` method exists on the builder to enable binding configuration to Celmah options.
@@ -88,6 +89,29 @@ builder.Host.UseCelmah((builderContext, celmah) =>
 {
     celmah.Configure(builderContext.Configuration.GetSection("Celmah"));
 });
+```
+
+### Ignoring specific HTTP status codes
+
+By default, Celmah logs all responses with status codes 400–599 as errors. You can
+suppress specific status codes (e.g. 404 Not Found) to reduce noise in production:
+
+```csharp
+builder.Host.UseCelmah((_, celmah) =>
+{
+    celmah.IgnoredStatusCodes = [404];              // skip 404s
+    // celmah.IgnoredStatusCodes = [404, 401, 403]; // skip multiple
+});
+```
+
+Or via `appsettings.json`:
+
+```json
+{
+    "Celmah": {
+        "IgnoredStatusCodes": [404]
+    }
+}
 ```
 
 ## Restrict access to the Celmah UI
