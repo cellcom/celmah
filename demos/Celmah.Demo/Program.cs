@@ -1,12 +1,13 @@
+using System.Diagnostics;
 using Celmah;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseCelmah((_, celmah) =>
 {
-    celmah.UseCelmahExceptionPage();
     celmah.PersistToMemory();
-    celmah.Configure(o => { o.IgnoredStatusCodes = [404]; o.EnableIpGeoLookup = true; });
+    //celmah.UseCelmahExceptionPage();
+    //celmah.Configure(o => { o.IgnoredStatusCodes = [404]; o.EnableIpGeoLookup = true; });
 });
 
 var app = builder.Build();
@@ -15,17 +16,19 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 app.UseCelmahMiddleware();
 
-if (app.Environment.IsDevelopment())
-    app.UseDeveloperExceptionPage();
-
 app.UseStaticFiles();
 app.UseRouting();
 
 app.MapCelmah();
 
 app.MapGet("/", () => Results.Text("""
-    <!DOCTYPE html>
-    <html><body>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Celmah Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css" />
+</head>
+<body>
     <h1>Celmah Demo</h1>
     <ul>
         <li><a href="/celmah">View Errors (Celmah UI)</a></li>
@@ -35,21 +38,12 @@ app.MapGet("/", () => Results.Text("""
         <li><a href="/log-sql">Log with SQL diagnostic messages</a></li>
         <li><a href="/params?phone=1234&id=5678">Log with method parameters</a></li>
     </ul>
-    </body></html>
-    """, "text/html"));
+</body>
+</html>
+""", "text/html"));
 
 // Thrown exception — caught by Celmah middleware, no VS debug break
-app.MapGet("/error", (HttpContext ctx) =>
-{
-    try
-    {
-        throw new InvalidOperationException("Test exception from Celmah Demo");
-    }
-    catch (Exception ex)
-    {
-        return Task.FromResult(ctx.RaiseErrorAsync(ex));
-    }
-});
+app.MapGet("/error", [DebuggerHidden] (HttpContext ctx) => throw new InvalidOperationException("Test exception from Celmah Demo"));
 
 // Explicitly raised error
 app.MapGet("/raise", (HttpContext ctx) => ctx.RaiseErrorAsync(new Exception("Raised via RaiseErrorAsync")));
