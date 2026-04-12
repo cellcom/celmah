@@ -14,5 +14,4 @@
     <InternalsVisibleTo Include="Celmah.Tests" />
   </ItemGroup>
 
-
 </Project>

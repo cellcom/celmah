@@ -5,6 +5,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Celmah.Serilog\Celmah.Serilog.csproj" />
     <ProjectReference Include="..\..\Celmah\Celmah.csproj" />
   </ItemGroup>
 </Project>

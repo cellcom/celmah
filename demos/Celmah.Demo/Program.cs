@@ -1,14 +1,21 @@
 using System.Diagnostics;
 using Celmah;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseCelmah((_, celmah) =>
 {
     celmah.PersistToMemory();
-    //celmah.UseCelmahExceptionPage();
-    //celmah.Configure(o => { o.IgnoredStatusCodes = [404]; o.EnableIpGeoLookup = true; });
 });
+
+// Configure Serilog with explicit CelmahSink registration.
+// This is the recommended approach: call .WriteTo.CelmahSink(services) directly.
+// Alternatively, use celmah.CaptureSerilogMessages() + .ReadFrom.Services(services)
+// but the explicit WriteTo.CelmahSink() approach is more reliable.
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .WriteTo.CelmahSink(services)
+    .WriteTo.Console());
 
 var app = builder.Build();
 
@@ -37,6 +44,7 @@ app.MapGet("/", () => Results.Text("""
         <li><a href="/log">Log via ILogger (shows message log in error detail)</a></li>
         <li><a href="/log-sql">Log with SQL diagnostic messages</a></li>
         <li><a href="/params?phone=1234&id=5678">Log with method parameters</a></li>
+        <li><a href="/serilog">Log via Serilog (test CelmahSink integration)</a></li>
     </ul>
 </body>
 </html>
@@ -69,6 +77,16 @@ app.MapGet("/params", (HttpContext ctx, string? phone, string? id) =>
 {
     ctx.LogParamsToElmah(new { phone, id });
     return ctx.RaiseErrorAsync(new Exception("Error with logged parameters"));
+});
+
+// Serilog sink test - log messages through MEL ILogger (which goes through Serilog pipeline)
+// and verify they appear in the Celmah error detail
+app.MapGet("/serilog", (HttpContext ctx) =>
+{
+    logger.LogInformation("Serilog test: Processing request at {Path}", ctx.Request.Path);
+    logger.LogWarning("Serilog test: Something suspicious happened");
+    logger.LogError("Serilog test: Simulated error during processing");
+    return ctx.RaiseErrorAsync(new Exception("Error with Serilog-captured log messages"));
 });
 
 app.Run();
