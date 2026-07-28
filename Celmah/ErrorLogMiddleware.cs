@@ -69,6 +69,15 @@ internal sealed class ErrorLogMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, ExceptionDispatchInfo exceptionInfo)
     {
+        // A client disconnecting cancels its in-flight request. That's expected
+        // behavior, not an application error, so don't log it — just rethrow.
+        if (exceptionInfo.SourceException is OperationCanceledException
+            && context.RequestAborted.IsCancellationRequested)
+        {
+            exceptionInfo.Throw();
+            return;
+        }
+
         var entry = await _elmahLogger.LogExceptionAsync(context, exceptionInfo.SourceException);
 
         string? location = null;
