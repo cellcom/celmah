@@ -558,6 +558,7 @@ span.error-line { color: red; font-weight: 600; }
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  overflow-x: clip;
   background-color: #faf9f8;
 
   .item-info {
