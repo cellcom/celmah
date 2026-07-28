@@ -556,6 +556,7 @@ span.error-line { color: red; font-weight: 600; }
 
 .e-detail {
   flex-grow: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   overflow-x: clip;
