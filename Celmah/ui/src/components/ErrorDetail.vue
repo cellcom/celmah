@@ -573,6 +573,7 @@ span.error-line { color: red; font-weight: 600; }
       .item-header {
         display: flex;
         flex-direction: column;
+        min-width: 0;
         padding: 10px;
 
         h4 { font-size: 18px; flex-grow: 1; }
@@ -580,6 +581,7 @@ span.error-line { color: red; font-weight: 600; }
         .item-header-text {
           min-width: 0;
           flex: 1 1 auto;
+          overflow: hidden;
           padding-right: 24px;
 
           .header-line {
@@ -616,6 +618,7 @@ span.error-line { color: red; font-weight: 600; }
         .item-subheader {
           display: flex;
           flex-direction: row;
+          min-width: 0;
 
           > div { min-width: 0; }
 
