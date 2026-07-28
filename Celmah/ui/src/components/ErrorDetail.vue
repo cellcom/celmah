@@ -27,18 +27,20 @@
                 </a>
               </div>
               <div>
-                <h3 class="message filter-link-hid">
-                  {{ item.message }}
-                  <a href="#" class="filter-link" @click.prevent="addFilter('message', '=', item.message)">
-                    <FilterIcon :size="14" />
-                  </a>
-                </h3>
-                <h6 class="filter-link-hid" style="color: #6b7fa3">
-                  {{ item.type }}
-                  <a href="#" class="filter-link" @click.prevent="addFilter('type', '=', item.type)">
-                    <FilterIcon :size="14" />
-                  </a>
-                </h6>
+                <div class="item-header-text">
+                  <h3 class="header-line type filter-link-hid">
+                    <span class="type-text" :title="item.type">{{ item.type }}</span>
+                    <a href="#" class="filter-link" @click.prevent="addFilter('type', '=', item.type)">
+                      <FilterIcon :size="14" />
+                    </a>
+                  </h3>
+                  <div class="header-line message filter-link-hid">
+                    <span class="message-text" :title="item.message">{{ item.message }}</span>
+                    <a href="#" class="filter-link" @click.prevent="addFilter('message', '=', item.message)">
+                      <FilterIcon :size="14" />
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -188,12 +190,17 @@
             href="#"
             @click.prevent="selectedTab = idx"
           >
-            <span v-if="tab.count != null" class="count">{{ tab.count }}</span>
             {{ tab.title }}
+            <span v-if="tab.count != null" class="count">{{ tab.count }}</span>
           </a>
         </li>
       </ul>
-      <div class="tab-content-area">
+      <div class="tab-content-area" ref="tabContentEl">
+        <!-- Full Message -->
+        <div v-if="selectedTab === getTabIndex('message')" class="tab-pane-content">
+          <div class="full-message">{{ item.message }}</div>
+        </div>
+
         <!-- Source Code -->
         <div v-if="selectedTab === getTabIndex('sources')" class="tab-pane-content">
           <div v-for="(code, key) in item.sources" :key="key" class="sources">
@@ -286,7 +293,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { CopyIcon, ExternalLinkIcon, FilterIcon, InfoIcon } from 'lucide-vue-next'
 import { api, getCelmahRoot } from '@/api'
 import { countryCodeToFlag, dateSubstring, formatTime } from '@/utils'
@@ -309,6 +316,7 @@ const store = useErrorStore()
 const countryInfo = ref<CountryInfo>({} as CountryInfo)
 const helpHtml = ref<HelpHtmlResponse | null>(null)
 const selectedTab = ref(0)
+const tabContentEl = ref<HTMLElement | null>(null)
 const isMobile = ref(window.innerWidth <= 1024)
 
 const celmahRoot = computed(() => getCelmahRoot())
@@ -342,6 +350,9 @@ const tableTabs = computed(() => {
 
 const visibleTabs = computed(() => {
   const tabs = []
+  if (props.item.message) {
+    tabs.push({ key: 'message', title: 'Message' })
+  }
   if (props.item.sources && props.item.sources.length > 0) {
     tabs.push({ key: 'sources', title: 'Source Code' })
   }
@@ -441,10 +452,10 @@ ${props.item.detail}
 
 function handleResize(): void {
   isMobile.value = window.innerWidth <= 1024
-  const tabs = document.getElementsByClassName('tab-content-area') as HTMLCollectionOf<HTMLElement>
-  if (!tabs || !tabs.length) return
-  const height = window.innerHeight - tabs[0].offsetTop - 10
-  tabs[0].style.height = window.innerWidth <= 1024 ? 'auto' : height + 'px'
+  const el = tabContentEl.value
+  if (!el) return
+  const height = window.innerHeight - el.offsetTop - 10
+  el.style.height = window.innerWidth <= 1024 ? 'auto' : height + 'px'
 }
 
 watch(() => props.item, () => {
@@ -465,10 +476,14 @@ watch(() => props.item, () => {
       .catch(e => console.log(e))
   }
   selectedTab.value = 0
+  nextTick(handleResize)
 }, { immediate: true })
+
+watch(helpHtml, () => nextTick(handleResize))
 
 onMounted(() => {
   window.addEventListener('resize', handleResize)
+  nextTick(handleResize)
 })
 
 onBeforeUnmount(() => {
@@ -496,6 +511,9 @@ span.error-line { color: red; font-weight: 600; }
 
 .nav-tabs .nav-link {
   color: #444;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .nav-tabs .nav-link.active {
   color: #000;
@@ -520,6 +538,15 @@ span.error-line { color: red; font-weight: 600; }
   border-top: 0;
   padding: 10px;
   background-color: #fff;
+}
+
+.full-message {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .msdn {
@@ -550,9 +577,47 @@ span.error-line { color: red; font-weight: 600; }
 
         h4 { font-size: 18px; flex-grow: 1; }
 
+        .item-header-text {
+          min-width: 0;
+          flex: 1 1 auto;
+          padding-right: 24px;
+
+          .header-line {
+            display: flex;
+            align-items: center;
+          }
+          .type {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.3;
+            .type-text {
+              font-weight: 600;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              min-width: 0;
+              flex: 1 1 auto;
+            }
+          }
+          .message {
+            margin-top: 2px;
+            .message-text {
+              font-size: 13px;
+              color: #6b7fa3;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              min-width: 0;
+              flex: 1 1 auto;
+            }
+          }
+        }
+
         .item-subheader {
           display: flex;
           flex-direction: row;
+
+          > div { min-width: 0; }
 
           .status {
             background-color: #888;
@@ -650,21 +715,17 @@ span.error-line { color: red; font-weight: 600; }
     margin: 0 10px;
 
     span.count {
-      position: relative;
-      top: -8px;
-      right: 3px;
       background-color: #888;
       color: #fff;
-      display: inline-block;
-      width: 15px;
-      height: 15px;
-      min-width: 15px;
-      line-height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      line-height: 1;
       font-size: 9px;
-      border-radius: 20px;
-      text-align: center;
-      margin-bottom: -15px;
-      margin-right: -15px;
+      border-radius: 10px;
     }
     .nav-link.active span.count { display: none; }
 
@@ -753,21 +814,18 @@ span.error-line { color: red; font-weight: 600; }
     .e-detail .item-info .item-info-panel .item-details .request-info { display: none; }
   }
   @media screen and (max-width: 720px) {
-    h3.message { font-size: 20px; }
+    .item-header-text .type { font-size: 20px; }
     .nav-tabs ul {
       display: block;
       padding-right: 10px;
       padding-bottom: 5px;
     }
     span.count {
-      width: 24px;
+      min-width: 24px;
       height: 24px;
       font-size: 13px;
-      margin: 0;
-      line-height: 25px;
-      margin-top: 5px;
     }
-    .nav-link.active span.count { display: block; }
+    .nav-link.active span.count { display: inline-flex; }
   }
 }
 </style>

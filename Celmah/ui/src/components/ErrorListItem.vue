@@ -14,7 +14,7 @@
         <span class="method">{{ item.method }}</span>
         <span class="url">{{ item.url }}</span>
       </div>
-      <div class="message">{{ item.message }}</div>
+      <div class="message" :title="item.message">{{ item.message }}</div>
     </div>
   </div>
 </template>
@@ -97,6 +97,7 @@ function onSelect() {
   }
   .e-list-item-col2 {
     flex-grow: 1;
+    min-width: 0;
     padding: 2px 6px;
     color: rgb(96, 94, 92);
 
@@ -122,7 +123,12 @@ function onSelect() {
       font-size: 14px;
       font-weight: 500;
     }
-    .message { font-size: 13px; }
+    .message {
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
 </style>
