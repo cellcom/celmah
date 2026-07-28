@@ -621,7 +621,10 @@ span.error-line { color: red; font-weight: 600; }
           display: flex;
           flex-direction: row;
           min-width: 0;
+          gap: 12px;
+          align-items: flex-start;
 
+          > div:first-child { flex-shrink: 0; }
           > div { min-width: 0; }
 
           .status {
@@ -634,7 +637,6 @@ span.error-line { color: red; font-weight: 600; }
             font-size: 22px;
             border-radius: 48px;
             text-align: center;
-            margin-right: 10px;
             margin-top: 5px;
           }
           .status.Error { background-color: $error-color; }
@@ -732,8 +734,6 @@ span.error-line { color: red; font-weight: 600; }
       font-size: 9px;
       border-radius: 10px;
     }
-    .nav-link.active span.count { display: none; }
-
     .tab-pane-content {
       table {
         width: 100%;
@@ -830,7 +830,6 @@ span.error-line { color: red; font-weight: 600; }
       height: 24px;
       font-size: 13px;
     }
-    .nav-link.active span.count { display: inline-flex; }
   }
 }
 </style>

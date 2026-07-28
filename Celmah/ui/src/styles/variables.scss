@@ -13,10 +13,10 @@ $info-bg: #dbeafe;             // Light blue for detail panel bg
 $info-text: #3b5bdb;           // Blue for OS/browser labels
 
 // Dark mode overrides (applied via [data-theme="dark"] on <html>)
-$dark-bg: #1a1a2e;
-$dark-surface: #16213e;
-$dark-surface-alt: #1e2a4a;
-$dark-border: #2a3a5c;
-$dark-text: #e0e0e0;
-$dark-text-muted: #a0a0b0;
-$dark-info-bg: #1e2a4a;
+$dark-bg: #18181b;          // App background (zinc-900)
+$dark-surface: #27272a;     // Panels, tab content (zinc-800)
+$dark-surface-alt: #1f1f23; // List panel
+$dark-border: #3f3f46;      // Borders (zinc-700)
+$dark-text: #e4e4e7;        // Primary text (zinc-200)
+$dark-text-muted: #a1a1aa;  // Muted text (zinc-400)
+$dark-info-bg: #27272a;     // Detail panel inset (neutral)
