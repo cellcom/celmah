@@ -6,11 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="9.7.0" />
+    <PackageReference Include="MySql.Data" Version="26.7.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Celmah.Common\Celmah.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.10.94" />
   </ItemGroup>
 
 </Project>

@@ -11,7 +11,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.13.1" />
 		<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.32" />
 	</ItemGroup>
 
@@ -25,6 +25,10 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="$(AssemblyName).Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Update="Nerdbank.GitVersioning" Version="3.10.94" />
 	</ItemGroup>
 
 	<!--<PropertyGroup Condition=" '$(TargetFramework)' == 'net10.0' ">

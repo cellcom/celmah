@@ -14,4 +14,8 @@
     <InternalsVisibleTo Include="Celmah.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.10.94" />
+  </ItemGroup>
+
 </Project>
