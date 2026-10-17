@@ -1,0 +1,13 @@
+diff --git a/index.js b/index.js
+index 69e1a71ada42a9563cbc2edb0567f86c42fa8fe6..98f66b0f8939146b8ee5729f410f6a8edfb64e58 100644
+--- a/index.js
++++ b/index.js
+@@ -70,7 +70,7 @@ function run(tscPath) {
+         }
+     }
+ }
+-function resolveTscPath(tscPath = require.resolve('typescript/lib/tsc')) {
++function resolveTscPath(tscPath = require.resolve('@typescript/typescript6/lib/tsc')) {
+     try {
+         const { name } = require(path.join(tscPath, '..', '..', 'package.json'));
+         if (name === '@typescript/typescript6') {

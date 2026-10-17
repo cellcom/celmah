@@ -1,6 +1,6 @@
 {
   "name": "celmah-ui",
-  "version": "0.1.0",
+  "version": "1.4.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,20 +11,24 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "axios": "^1.18.1",
+    "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
-    "highlight.js": "^11.11.1",
+    "highlight.js": "^11.12.0",
     "lucide-vue-next": "^1.0.0",
-    "pinia": "^4.0.2",
-    "vue": "^3.5.40",
-    "vue-router": "^5.2.0"
+    "pinia": "^4.1.0",
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
-    "@types/node": "^26.1.2",
-    "@vitejs/plugin-vue": "^6.0.8",
-    "sass": "^1.102.0",
-    "typescript": "^6.0.3",
-    "vite": "^8.1.5",
-    "vue-tsc": "^3.3.8"
+    "@types/node": "^26.6.5",
+    "@typescript/typescript6": "^6.0.2",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "sass": "^1.105.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vue-tsc": "^3.3.13"
+  },
+  "patchedDependencies": {
+    "vue-tsc@3.3.13": "patches/vue-tsc@3.3.13.patch"
   }
 }

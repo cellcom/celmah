@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(import.meta.dirname, 'src'),
     },
   },
   base: './',
@@ -22,7 +22,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: path.resolve(__dirname, '../wwwroot'),
+    outDir: path.resolve(import.meta.dirname, '../wwwroot'),
     emptyOutDir: true,
   },
 })
