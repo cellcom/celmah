@@ -329,7 +329,8 @@ celmah/
 ├── Celmah.Serilog/               # Serilog sink
 ├── Tests/Celmah.Tests/           # Unit tests
 ├── demos/Celmah.Demo/            # Demo app (memory persistence)
-├── build.sh                      # Build, pack & publish script
+├── build.ps1                     # Build, pack & publish script (PowerShell 7)
+├── bump-version.ps1              # Bump all version.json files
 ├── Directory.Build.props         # Shared MSBuild properties
 ├── version.json                  # Root NB.GV version
 └── nuget.config                  # Local feed configuration
@@ -341,32 +342,41 @@ celmah/
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Bun](https://bun.sh/) (for building the Vue SPA)
+- [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell) (`pwsh`, for the build scripts — Windows, Linux or macOS)
 
-### Using build.sh
+### Using build.ps1
 
-```shell
+```powershell
 # Build all packages (SPA + core + extensions)
-./build.sh
+./build.ps1
 
 # Build only Celmah + Celmah.Common
-./build.sh --core
+./build.ps1 -Core
 
-# Build and publish to local feed
-./build.sh --push
-./build.sh --core --push
+# Build and publish to local feed (default: C:\git\nuget\Celmah, /mnt/c/git/nuget/Celmah on Linux)
+./build.ps1 -Push
+./build.ps1 -Core -Push
 
 # Skip SPA rebuild (e.g. only C# changed)
-./build.sh --skip-spa
+./build.ps1 -SkipSpa
 
 # Custom feed path
-./build.sh --push /path/to/feed
+./build.ps1 -Push -Feed D:\path\to\feed
 ```
 
 The script will:
 
 1. **Build the Vue SPA** (`Celmah/ui/` → `Celmah/wwwroot/`)
 2. **Pack NuGet packages** into `artifacts/package/release/`
-3. **Publish** to local feed (when `--push` is used)
+3. **Publish** to local feed (when `-Push` is used)
+
+### Bumping the version
+
+```powershell
+./bump-version.ps1 1.5              # update all 8 version.json files and commit
+./bump-version.ps1 1.5 -NoCommit    # update only, review with git diff
+./build.ps1 -Push
+```
 
 ### Manual step-by-step
 
@@ -383,7 +393,7 @@ dotnet pack Celmah.Common/Celmah.Common.csproj -c Release
 dotnet pack Celmah.SqlServer/Celmah.SqlServer.csproj -c Release
 
 # 3. Publish to local feed
-dotnet nuget push artifacts/package/release/Celmah.*.nupkg --source /mnt/c/git/nuget/Celmah
+dotnet nuget push artifacts/package/release/Celmah.*.nupkg --source C:\git\nuget\Celmah
 ```
 
 ### Consuming local packages
@@ -395,7 +405,7 @@ Add a `nuget.config` to the consuming project:
 <configuration>
   <packageSources>
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-    <add key="CelmahLocal" value="/mnt/c/git/nuget/Celmah" />
+    <add key="CelmahLocal" value="C:\git\nuget\Celmah" />
   </packageSources>
 </configuration>
 ```
@@ -419,7 +429,7 @@ This fork diverges from [jrsearles/Elmah.AspNetCore](https://github.com/jrsearle
 - **Nerdbank.GitVersioning** for automatic versioning based on git commits
 - **Flattened project layout** — all `.csproj` at repo root (no `src/` directory)
 - **SPA lives inside `Celmah/ui/`** — UI changes automatically bump the core package version
-- **Consolidated build script** (`build.sh`) with `--core`, `--push`, `--skip-spa` flags
+- **Consolidated build script** (`build.ps1`) with `-Core`, `-Push`, `-SkipSpa` flags, plus `bump-version.ps1`
 - **IgnoredStatusCodes** option to suppress specific HTTP status code logging
 - **EnableIpGeoLookup** option for IP geo-lookup in error detail UI
 - **SPA API base path** reads `<meta name="celmah-root">` for reverse proxy support
