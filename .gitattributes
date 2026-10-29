@@ -1,0 +1,7 @@
+# Line endings: LF in the repo, native (CRLF on Windows) in the working copy
+* text=auto
+# Must stay LF: run in WSL / Linux / Git Bash
+*.sh text eol=lf
+# Must stay CRLF: Windows command scripts
+*.cmd text eol=crlf
+*.bat text eol=crlf
