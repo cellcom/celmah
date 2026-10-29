@@ -11,7 +11,7 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "axios": "^1.20.0",
+    "axios": "^1.21.0",
     "bootstrap": "^5.3.8",
     "highlight.js": "^11.12.0",
     "lucide-vue-next": "^1.0.0",
@@ -20,15 +20,15 @@
     "vue-router": "^5.4.0"
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@typescript/typescript6": "^6.0.2",
     "@vitejs/plugin-vue": "^6.0.10",
-    "sass": "^1.105.2",
+    "sass": "^1.107.0",
     "typescript": "^7.0.2",
-    "vite": "^8.3.4",
-    "vue-tsc": "^3.3.13"
+    "vite": "^8.3.5",
+    "vue-tsc": "^3.3.14"
   },
   "patchedDependencies": {
-    "vue-tsc@3.3.13": "patches/vue-tsc@3.3.13.patch"
+    "vue-tsc@3.3.14": "patches/vue-tsc@3.3.14.patch"
   }
 }
