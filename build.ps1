@@ -10,12 +10,21 @@
   ./build.ps1 -Core -Push           # Build only core and publish to the local feed
   ./build.ps1 -Push -Feed D:\feed   # Build all and publish to a custom feed
   ./build.ps1 -SkipSpa              # Skip the Vue SPA build
+  ./build.ps1 -NoPush               # Build only, publish nowhere
+
+.NOTES
+  When CELMAH_NUGET_SOURCE and CELMAH_NUGET_API_KEY are set, every build also publishes
+  to that NuGet server (versions already there are skipped). -NoPush turns this off.
+  -Source / -ApiKey override the environment variables.
 #>
 [CmdletBinding()]
 param(
     [switch]$Core,                   # Build only Celmah + Celmah.Common (no extensions)
     [switch]$Push,                   # Publish to the local NuGet feed
+    [switch]$NoPush,                 # Publish nowhere (overrides -Push and the NuGet server)
     [string]$Feed = $(if ($IsWindows) { 'C:\git\nuget\Celmah' } else { '/mnt/c/git/nuget/Celmah' }),
+    [string]$Source = $env:CELMAH_NUGET_SOURCE,   # NuGet server to publish to
+    [string]$ApiKey = $env:CELMAH_NUGET_API_KEY,  # API key for -Source
     [switch]$SkipSpa                 # Skip the Vue SPA build
 )
 
@@ -42,6 +51,12 @@ $CorePackages = @(
 $Packages = if ($Core) { $CorePackages } else { $AllPackages }
 $Scope    = if ($Core) { 'core' } else { 'all' }
 
+if ($NoPush) { $Push = $false }
+$PushServer = -not $NoPush -and $Source -and $ApiKey
+if (-not $NoPush -and [bool]$Source -ne [bool]$ApiKey) {
+    Write-Warning 'Set both CELMAH_NUGET_SOURCE and CELMAH_NUGET_API_KEY (or -Source and -ApiKey) to publish to a NuGet server.'
+}
+
 # --- Header ---
 Write-Host '========================================'
 Write-Host ' Celmah – Build'
@@ -50,6 +65,7 @@ Write-Host "Scope    : $Scope"
 Write-Host "Packages : $($Packages.Count)"
 Write-Host "Push     : $Push"
 if ($Push) { Write-Host "Feed     : $Feed" }
+if ($PushServer) { Write-Host "Server   : $Source" }
 Write-Host ''
 
 # --- 1. Build the Vue SPA ---
@@ -83,6 +99,15 @@ if ($Push) {
     foreach ($nupkg in Get-ChildItem $PackageDir -Filter *.nupkg) {
         Write-Host "    pushing $($nupkg.Name)"
         dotnet nuget push $nupkg.FullName --source $Feed
+    }
+    Write-Host ''
+}
+
+if ($PushServer) {
+    Write-Host ">>> Publishing to NuGet server: $Source"
+    foreach ($nupkg in Get-ChildItem $PackageDir -Filter *.nupkg) {
+        Write-Host "    pushing $($nupkg.Name)"
+        dotnet nuget push $nupkg.FullName --source $Source --api-key $ApiKey --skip-duplicate
     }
     Write-Host ''
 }
